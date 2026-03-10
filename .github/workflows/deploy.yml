@@ -27,9 +27,11 @@ jobs:
         run: composer install --no-dev --optimize-autoloader --prefer-dist --no-interaction --no-progress
 
       - name: 🔐 Create .env file
+        env:
+          ENV_PROD_EXTRAS: ${{ secrets.ENV_PROD_EXTRAS }}
         run: |
           # 1. CORE CONFIG (Hardcoded based on User Request)
-          echo "APP_ENV=production" >> .env
+          echo "APP_ENV=production" > .env
           echo "APP_DEBUG=false" >> .env
           echo "APP_NAME=TheFramework" >> .env
           echo "APP_KEY=base64:hjn/brjAmN4+flvaSBljbXB0sTSgJnFAF6B4NZs72O4=" >> .env
@@ -40,9 +42,9 @@ jobs:
           echo "ENCRYPTION_KEY=" >> .env
           echo "API_SECRET_KEY=" >> .env
           
-          # 2. BULK EXTRAS (From secret: ENV_PROD_EXTRAS)
-          # This contains BASE_URL, DB Creds, Mail Creds, and System Auth
-          echo "${{ secrets.ENV_PROD_EXTRAS }}" >> .env
+          # 2. BULK EXTRAS (Safe from shell expansion)
+          # Use printf to ensure $ characters and spaces are preserved correctly
+          printf '%s\n' "$ENV_PROD_EXTRAS" >> .env
 
       - name: Sync files to InfinityFree
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
