@@ -21,7 +21,7 @@
                     <div class="h-10 w-10 bg-blue-50 text-ksc-blue rounded-xl flex items-center justify-center mb-4">
                         <i data-lucide="users" class="w-5 h-5"></i>
                     </div>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Atlet</p>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Member</p>
                     <h3 class="text-xl md:text-2xl font-black text-slate-900 mt-1">{{ number_format($totalAnggota) }}</h3>
                 </div>
 

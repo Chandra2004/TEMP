@@ -101,8 +101,13 @@
                             <div class="event-card group bg-white rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-2xl hover:shadow-slate-200 transition-all duration-300 overflow-hidden flex flex-col"
                                 data-status="berjalan">
                                 <div class="relative h-48 overflow-hidden">
-                                    <img src="{{ url('/file/banner-event/' . $event['banner_event']) }}"
-                                        class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                    @if ($event->banner_event === null)
+                                        <img src="https://lh5.googleusercontent.com/proxy/t08n2HuxPfw8OpbutGWjekHAgxfPFv-pZZ5_-uTfhEGK8B5Lp-VN4VjrdxKtr8acgJA93S14m9NdELzjafFfy13b68pQ7zzDiAmn4Xg8LvsTw1jogn_7wStYeOx7ojx5h63Gliw"
+                                            alt="Banner Event" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                    @else
+                                        <img src="{{ url('/file/banner-event/' . $event['banner_event']) }}"
+                                            alt="Banner Event" class="w-16 h-10 object-cover rounded">
+                                    @endif
                                     <div class="absolute top-4 left-4 flex gap-2">
                                         <span
                                             class="px-3 py-1 bg-ksc-accent text-slate-900 text-[10px] font-black uppercase rounded-full shadow-lg">Berbayar</span>

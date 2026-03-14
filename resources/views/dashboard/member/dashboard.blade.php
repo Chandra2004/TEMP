@@ -18,8 +18,13 @@
                             <div
                                 class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden flex flex-col text-left">
                                 <div class="w-full h-48 bg-slate-100 relative">
-                                    <img src="{{ url('/file/banner-event/' . $event['banner_event']) }}"
-                                        class="w-full h-full object-cover">
+                                    @if ($event->banner_event == null)
+                                        <img src="https://lh5.googleusercontent.com/proxy/t08n2HuxPfw8OpbutGWjekHAgxfPFv-pZZ5_-uTfhEGK8B5Lp-VN4VjrdxKtr8acgJA93S14m9NdELzjafFfy13b68pQ7zzDiAmn4Xg8LvsTw1jogn_7wStYeOx7ojx5h63Gliw"
+                                            class="w-full h-full object-cover">
+                                    @else
+                                        <img src="{{ url('/file/banner-event/' . $event['banner_event']) }}"
+                                            class="w-full h-full object-cover">
+                                    @endif
                                     @if (isset($event['is_registered']) && $event['is_registered'])
                                         <div
                                             class="absolute top-3 left-3 px-3 py-1 bg-green-500 text-white text-[10px] font-bold rounded-full shadow-lg">

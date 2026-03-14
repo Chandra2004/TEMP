@@ -119,17 +119,22 @@
                                                             {{ \Carbon\Carbon::parse($registration->user->tanggal_registrasi)->translatedFormat('d F Y') }}
                                                         </td>
                                                         <td class="px-6 py-4 text-center">
-                                                            @if ($registration->payment->status_pembayaran === 'menunggu')
-                                                                <span
-                                                                    class="px-3 py-1 text-[9px] font-black uppercase rounded-lg bg-yellow-100 text-yellow-700 border border-yellow-200">{{ $registration->payment->status_pembayaran }}</span>
-                                                            @endif
-                                                            @if ($registration->payment->status_pembayaran === 'diterima')
-                                                                <span
-                                                                    class="px-3 py-1 text-[9px] font-black uppercase rounded-lg bg-green-100 text-green-700 border border-green-200">{{ $registration->payment->status_pembayaran }}</span>
-                                                            @endif
-                                                            @if ($registration->payment->status_pembayaran === 'ditolak')
-                                                                <span
-                                                                    class="px-3 py-1 text-[9px] font-black uppercase rounded-lg bg-red-100 text-red-700 border border-red-200">{{ $registration->payment->status_pembayaran }}</span>
+                                                            @if ($registration->payment->status_pembayaran === null)
+                                                            <span
+                                                            class="px-3 py-1 text-[9px] font-black uppercase rounded-lg bg-gray-100 text-gray-700 border border-gray-200">Tidak ada Pembayaran</span>
+                                                            @else
+                                                                @if ($registration->payment->status_pembayaran === 'menunggu')
+                                                                    <span
+                                                                        class="px-3 py-1 text-[9px] font-black uppercase rounded-lg bg-yellow-100 text-yellow-700 border border-yellow-200">{{ $registration->payment->status_pembayaran }}</span>
+                                                                @endif
+                                                                @if ($registration->payment->status_pembayaran === 'diterima')
+                                                                    <span
+                                                                        class="px-3 py-1 text-[9px] font-black uppercase rounded-lg bg-green-100 text-green-700 border border-green-200">{{ $registration->payment->status_pembayaran }}</span>
+                                                                @endif
+                                                                @if ($registration->payment->status_pembayaran === 'ditolak')
+                                                                    <span
+                                                                        class="px-3 py-1 text-[9px] font-black uppercase rounded-lg bg-red-100 text-red-700 border border-red-200">{{ $registration->payment->status_pembayaran }}</span>
+                                                                @endif
                                                             @endif
                                                         </td>
                                                         <td class="px-6 py-4 text-center">

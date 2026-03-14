@@ -130,9 +130,9 @@
 
                             <div class="flex justify-between items-center p-3 border-b border-slate-100">
                                 <h3 class="font-semibold text-slate-800 text-sm">Notifikasi</h3>
-                                <a href="#"
+                                <a href="{{ url('/' . $user['nama_role'] . '/dashboard/notifications') }}"
                                     class="text-xs text-blue-500 hover:underline font-medium focus:outline-none">
-                                    Tandai semua dibaca
+                                    Lihat semua
                                 </a>
                             </div>
 
@@ -146,7 +146,7 @@
                                         <a href="#" class="flex-grow">
                                             <p class="text-sm text-slate-700 font-bold">{{ $notification['judul'] }}</p>
                                             <span
-                                                class="font-normal text-slate-600 line-clamp-2 text-sm">{{ $notification['pesan'] }}</span>
+                                                class="font-normal text-slate-600 line-clamp-2 text-sm">{!! $notification['pesan'] !!}</span>
                                         </a>
                                         <button title="Tandai sudah dibaca"
                                             class="p-1 text-slate-400 hover:text-blue-500 rounded-full focus:outline-none focus:bg-blue-100">

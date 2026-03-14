@@ -177,7 +177,15 @@ class DashboardController extends Controller
             $event = Event::where('uid', $eventUid)->first();
         }
 
+        // return View::render('dashboard.general.reports.pdf-pendaftaran', [
+        //     'user' => Helper::session_get('user'),
+        //     'registrations' => $data,
+        //     'event' => $event,
+        //     'title' => 'Laporan Pendaftaran Event ' . ($event == null ? '' : $event['nama_event'])
+        // ]);
+        
         $html = View::renderToString('dashboard.general.reports.pdf-pendaftaran', [
+            'user' => Helper::session_get('user'),
             'registrations' => $data,
             'event' => $event,
             'title' => 'Laporan Pendaftaran Event'

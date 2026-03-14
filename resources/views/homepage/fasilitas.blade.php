@@ -32,7 +32,7 @@
                 <span class="text-ksc-accent font-bold tracking-widest text-xs uppercase mb-4 block underline decoration-2 underline-offset-8 decoration-ksc-blue">Olympic Standard</span>
                 <h2 class="text-4xl font-bold text-slate-900 mb-6">Kolam Renang Utama (Olympic Size)</h2>
                 <p class="text-slate-600 text-lg mb-8 leading-relaxed">
-                    Kolam berukuran 50 x 25 meter dengan kedalaman standar kompetisi nasional. Dilengkapi dengan sistem filtrasi canggih yang menjamin kualitas air tetap prima setiap saat.
+                    Kolam berukuran 25 x 15 meter dengan kedalaman standar kompetisi nasional. Dilengkapi dengan sistem filtrasi canggih yang menjamin kualitas air tetap prima setiap saat.
                 </p>
                 <div class="grid grid-cols-2 gap-4">
                     <div class="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm border border-slate-100">

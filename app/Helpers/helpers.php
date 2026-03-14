@@ -9,6 +9,34 @@ if (!function_exists('url')) {
     }
 }
 
+if (!function_exists('dd')) {
+    /**
+     * Dump and Die - Premium Version
+     */
+    function dd(...$vars)
+    {
+        if (php_sapi_name() === 'cli') {
+            foreach ($vars as $v)
+                var_dump($v);
+            die();
+        }
+
+        echo '<div style="background:#111; color:#0f0; padding:20px; font-family:monospace; font-size:13px; border-left:5px solid #ff4444; margin:10px; border-radius:4px; box-shadow:0 10px 30px rgba(0,0,0,0.5); overflow:auto; max-height:800px;">';
+        echo '<div style="color:#666; margin-bottom:10px; font-size:10px;">THE FRAMEWORK v5.0 BUG HUNTER</div>';
+        foreach ($vars as $var) {
+            echo '<pre style="white-space:pre-wrap;">';
+            var_dump($var);
+            echo '</pre>';
+            echo '<hr style="border:0; border-top:1px solid #333; margin:10px 0;">';
+        }
+        $trace = debug_backtrace()[0];
+        echo '<div style="color:#fff; background:#333; display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px;">Called in: ' . $trace['file'] . ' on line ' . $trace['line'] . '</div>';
+        echo '</div>';
+        die();
+    }
+}
+
+
 if (!function_exists('redirect')) {
     function redirect($url, $status = null, $message = null)
     {

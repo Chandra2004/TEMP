@@ -62,7 +62,7 @@ class RegistrationController extends DashboardController
             ->orderBy('tanggal_registrasi', 'DESC')
             ->all();
 
-        return View::render('trash.p3.riwayat', array_merge($this->dataTetap, [
+        return View::render('dashboard.member.registration-history', array_merge($this->dataTetap, [
             'title' => 'Riwayat Pendaftaran | Khafid Swimming Club (KSC) - Official Website',
             'registrations' => $registrations
         ]));
@@ -75,10 +75,10 @@ class RegistrationController extends DashboardController
         $user = User::where('uid', $request->input('uid_user'))->first();
 
         $fallbackUrl = $event ? "/detail-event/{$event['slug']}/{$event['uid']}" : '/events';
-        $redirectUrl = previous($fallbackUrl);
+        $redirectUrl = Helper::previous($fallbackUrl);
 
         if ($user == null || $event == null) {
-            return Helper::redirect(previous('/events'), 'warning', 'Kredensial pengguna yang anda daftarkan tidak tersedia', 10);
+            return Helper::redirect(Helper::previous('/events'), 'warning', 'Kredensial pengguna yang anda daftarkan tidak tersedia', 10);
         }
 
         $existingRegistration = Registration::query()->where('uid_user', '=', $user->uid)->where('uid_event', '=', $event->uid)->first();
@@ -148,12 +148,12 @@ class RegistrationController extends DashboardController
 
             $registration = Registration::where('uid', $uidRegistration)->first();
             if (!$registration) {
-                return Helper::redirect(previous(), 'error', 'Pendaftaran tidak ditemukan.', 10);
+                return Helper::redirect(Helper::previous(), 'error', 'Pendaftaran tidak ditemukan.', 10);
             }
 
             $event = Event::where('uid', $registration['uid_event'])->first();
             if (!$event) {
-                return Helper::redirect(previous(), 'error', 'Event terkait tidak ditemukan.', 10);
+                return Helper::redirect(Helper::previous(), 'error', 'Event terkait tidak ditemukan.', 10);
             }
 
             $registrationUpdateData = [
@@ -182,9 +182,9 @@ class RegistrationController extends DashboardController
                 $this->payment->updatePayment($paymentUpdateData, $paymentRecord->uid);
             }
 
-            return Helper::redirect(previous(), 'success', 'Pendaftaran berhasil diperbarui.', 10);
+            return Helper::redirect(Helper::previous(), 'success', 'Pendaftaran berhasil diperbarui.', 10);
         } catch (Exception $e) {
-            return Helper::redirect(previous(), 'error', 'Terjadi kesalahan: ' . $e->getMessage(), 10);
+            return Helper::redirect(Helper::previous(), 'error', 'Terjadi kesalahan: ' . $e->getMessage(), 10);
         }
     }
 
@@ -197,12 +197,12 @@ class RegistrationController extends DashboardController
 
             $registration = Registration::where('uid', $uidRegistration)->first();
             if (!$registration) {
-                return Helper::redirect(previous(), 'error', 'Pendaftaran tidak ditemukan.', 10);
+                return Helper::redirect(Helper::previous(), 'error', 'Pendaftaran tidak ditemukan.', 10);
             }
 
             $event = Event::where('uid', $registration['uid_event'])->first();
             if (!$event) {
-                return Helper::redirect(previous(), 'error', 'Event terkait tidak ditemukan.', 10);
+                return Helper::redirect(Helper::previous(), 'error', 'Event terkait tidak ditemukan.', 10);
             }
 
             if ($event['tipe_event'] === 'berbayar') {
@@ -219,12 +219,12 @@ class RegistrationController extends DashboardController
             $status = $this->registration->deleteRegistration($uidRegistration);
 
             if ($status === false) {
-                return Helper::redirect(previous(), 'error', 'Pendaftaran gagal dihapus.', 10);
+                return Helper::redirect(Helper::previous(), 'error', 'Pendaftaran gagal dihapus.', 10);
             }
 
-            return Helper::redirect(previous(), 'success', 'Pendaftaran berhasil dihapus.', 10);
+            return Helper::redirect(Helper::previous(), 'success', 'Pendaftaran berhasil dihapus.', 10);
         } catch (Exception $e) {
-            return Helper::redirect(previous(), 'error', 'Terjadi kesalahan: ' . $e->getMessage(), 10);
+            return Helper::redirect(Helper::previous(), 'error', 'Terjadi kesalahan: ' . $e->getMessage(), 10);
         }
     }
 }

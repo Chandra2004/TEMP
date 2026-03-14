@@ -146,7 +146,7 @@ class GalleryController extends DashboardController
             // Simpan setiap data (Menggunakan batch insert dalam satu transaksi)
             $this->gallery->addMultipleGallery($batchData);
 
-            return Helper::redirect(previous(), 'success', count($batchData) . ' foto berhasil ditambahkan ke galeri.', 10);
+            return Helper::redirect(Helper::previous(), 'success', count($batchData) . ' foto berhasil ditambahkan ke galeri.', 10);
         } catch (Exception $e) {
             // Hapus file yang sudah terlanjur diupload jika error
             if (!empty($uploadedPaths)) {
@@ -154,7 +154,7 @@ class GalleryController extends DashboardController
                     UploadHandler::delete($path, '/gallery');
                 }
             }
-            return Helper::redirect(previous(), 'error', 'Terjadi kesalahan: ' . $e->getMessage(), 10);
+            return Helper::redirect(Helper::previous(), 'error', 'Terjadi kesalahan: ' . $e->getMessage(), 10);
         }
     }
 
@@ -169,7 +169,7 @@ class GalleryController extends DashboardController
             $oldGallery = Gallery::where('uid', $uidGallery)->first();
 
             if (!$oldGallery) {
-                return Helper::redirect(previous(), 'error', 'Galeri tidak ditemukan.', 10);
+                return Helper::redirect(Helper::previous(), 'error', 'Galeri tidak ditemukan.', 10);
             }
 
             $fotoEvent = $oldGallery['foto_event'];
@@ -191,12 +191,12 @@ class GalleryController extends DashboardController
 
             $this->gallery->updateGallery($data, $uidGallery);
 
-            return Helper::redirect(previous(), 'success', 'Foto galeri berhasil diperbarui.', 10);
+            return Helper::redirect(Helper::previous(), 'success', 'Foto galeri berhasil diperbarui.', 10);
         } catch (Exception $e) {
             if (isset($fotoEvent) && $request->hasFile('foto_event')) { // Only delete if a new file was uploaded and caused error
                 UploadHandler::delete($fotoEvent, '/gallery');
             }
-            return Helper::redirect(previous(), 'error', 'Terjadi kesalahan: ' . $e->getMessage(), 10);
+            return Helper::redirect(Helper::previous(), 'error', 'Terjadi kesalahan: ' . $e->getMessage(), 10);
         }
     }
 
@@ -209,7 +209,7 @@ class GalleryController extends DashboardController
 
             $gallery = Gallery::where('uid', $uidGallery)->first();
             if (!$gallery) {
-                return Helper::redirect(previous(), 'error', 'Galeri tidak ditemukan.', 10);
+                return Helper::redirect(Helper::previous(), 'error', 'Galeri tidak ditemukan.', 10);
             }
 
             if ($gallery['foto_event']) {
@@ -218,9 +218,9 @@ class GalleryController extends DashboardController
 
             $this->gallery->deleteGallery($uidGallery);
 
-            return Helper::redirect(previous(), 'success', 'Foto galeri berhasil dihapus.', 10);
+            return Helper::redirect(Helper::previous(), 'success', 'Foto galeri berhasil dihapus.', 10);
         } catch (Exception $e) {
-            return Helper::redirect(previous(), 'error', 'Terjadi kesalahan: ' . $e->getMessage(), 10);
+            return Helper::redirect(Helper::previous(), 'error', 'Terjadi kesalahan: ' . $e->getMessage(), 10);
         }
     }
 }

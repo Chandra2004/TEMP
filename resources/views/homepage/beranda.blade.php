@@ -27,8 +27,8 @@
                 <div
                     class="flex items-center gap-4 bg-white/5 backdrop-blur-sm p-4 rounded-2xl border border-white/10 w-fit">
                     <div class="h-10 w-1 bg-ksc-accent rounded-full shadow-[0_0_15px_rgba(255,255,255,0.5)]"></div>
-                    <p class="text-white font-medium italic text-lg text-shadow">"Water is our element. Excellence is our
-                        habit."</p>
+                    <p class="text-white font-medium italic text-lg text-shadow">"Muridku adalah prioritasku, latihanku
+                        adalah ibadahku."</p>
                 </div>
             </div>
         </div>
@@ -115,16 +115,16 @@
                                 @if ($event['status_event'] === 'berjalan')
                                     <span
                                         class="inline-block bg-green-500 text-white text-[10px] md:text-xs font-bold px-3 py-1 rounded tracking-wider uppercase">{{ $event['status_event'] }}</span>
-                                @endif    
+                                @endif
                                 @if ($event['status_event'] === 'ditunda')
                                     <span
                                         class="inline-block bg-yellow-500 text-white text-[10px] md:text-xs font-bold px-3 py-1 rounded tracking-wider uppercase">{{ $event['status_event'] }}</span>
-                                @endif    
+                                @endif
                                 @if ($event['status_event'] === 'ditutup')
                                     <span
                                         class="inline-block bg-red-500 text-white text-[10px] md:text-xs font-bold px-3 py-1 rounded tracking-wider uppercase">{{ $event['status_event'] }}</span>
-                                @endif    
-                                
+                                @endif
+
                             </div>
 
                             <h3 class="text-2xl md:text-4xl font-bold text-white mb-4 leading-tight">

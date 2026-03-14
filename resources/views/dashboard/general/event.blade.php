@@ -41,8 +41,13 @@
                         @foreach ($events['data'] as $event)
                             <tr class="hover:bg-slate-50 transition">
                                 <td class="px-6 py-4">
-                                    <img src="{{ url('/file/banner-event/' . $event['banner_event']) }}" alt="Banner Event"
-                                        class="w-16 h-10 object-cover rounded">
+                                    @if ($event->banner_event === null)
+                                        <img src="https://lh5.googleusercontent.com/proxy/t08n2HuxPfw8OpbutGWjekHAgxfPFv-pZZ5_-uTfhEGK8B5Lp-VN4VjrdxKtr8acgJA93S14m9NdELzjafFfy13b68pQ7zzDiAmn4Xg8LvsTw1jogn_7wStYeOx7ojx5h63Gliw"
+                                            alt="Banner Event" class="w-16 h-10 object-cover rounded">
+                                    @else
+                                        <img src="{{ url('/file/banner-event/' . $event['banner_event']) }}"
+                                            alt="Banner Event" class="w-16 h-10 object-cover rounded">
+                                    @endif
                                 </td>
                                 <td class="px-6 py-4">
                                     <p class="text-sm font-bold text-slate-900">{{ $event['nama_event'] }}</p>

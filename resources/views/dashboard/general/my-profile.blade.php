@@ -33,35 +33,37 @@
                         <input type="file" name="foto_profil" x-ref="avatarInput" class="hidden" accept="image/*"
                             @change="previewFile($event, 'avatar')">
                     </div>
-                    <h3 class="text-xl font-bold text-slate-900 uppercase tracking-tight">Avatar Anggota</h3>
+                    <h3 class="text-xl font-bold text-slate-900 uppercase tracking-tight">{{ 'avatar ' . $user['nama_role'] }}</h3>
                     <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mt-1 italic">Profil Utama
                     </p>
                 </div>
 
-                <div class="bg-white border border-slate-200 rounded-[2.5rem] p-8 shadow-sm text-left">
-                    <label class="block mb-4 text-[11px] font-black text-slate-400 uppercase tracking-widest">Verifikasi
-                        Identitas (KTP)</label>
-                    <div class="relative w-full h-44 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 overflow-hidden group cursor-pointer"
-                        @click="$refs.ktpInput.click()">
+                @if ($user['nama_role'] != 'admin')
+                    <div class="bg-white border border-slate-200 rounded-[2.5rem] p-8 shadow-sm text-left">
+                        <label class="block mb-4 text-[11px] font-black text-slate-400 uppercase tracking-widest">Verifikasi
+                            Identitas (KTP)</label>
+                        <div class="relative w-full h-44 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 overflow-hidden group cursor-pointer"
+                            @click="$refs.ktpInput.click()">
 
-                        <img :src="ktpUrl" x-show="ktpUrl" class="w-full h-full object-cover">
+                            <img :src="ktpUrl" x-show="ktpUrl" class="w-full h-full object-cover">
 
-                        <div class="absolute inset-0 flex flex-col items-center justify-center bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity"
-                            x-show="ktpUrl">
-                            <p class="text-white text-[10px] font-bold uppercase tracking-widest">Ganti Lampiran KTP</p>
+                            <div class="absolute inset-0 flex flex-col items-center justify-center bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity"
+                                x-show="ktpUrl">
+                                <p class="text-white text-[10px] font-bold uppercase tracking-widest">Ganti Lampiran KTP</p>
+                            </div>
+
+                            <div class="flex flex-col items-center justify-center h-full space-y-2" x-show="!ktpUrl">
+                                <i data-lucide="image-plus" class="w-8 h-8 text-slate-300"></i>
+                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Unggah Foto KTP
+                                </p>
+                            </div>
                         </div>
-
-                        <div class="flex flex-col items-center justify-center h-full space-y-2" x-show="!ktpUrl">
-                            <i data-lucide="image-plus" class="w-8 h-8 text-slate-300"></i>
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Unggah Foto KTP
-                            </p>
-                        </div>
+                        <input type="file" name="foto_ktp" x-ref="ktpInput" class="hidden" accept="image/*"
+                            @change="previewFile($event, 'ktp')">
+                        <p class="mt-4 text-[9px] text-slate-400 italic text-center font-medium uppercase tracking-tighter">
+                            * Data KTP bersifat rahasia dan hanya untuk validasi admin</p>
                     </div>
-                    <input type="file" name="foto_ktp" x-ref="ktpInput" class="hidden" accept="image/*"
-                        @change="previewFile($event, 'ktp')">
-                    <p class="mt-4 text-[9px] text-slate-400 italic text-center font-medium uppercase tracking-tighter">
-                        * Data KTP bersifat rahasia dan hanya untuk validasi admin</p>
-                </div>
+                @endif
             </div>
 
             <div class="lg:col-span-2 space-y-6 text-left">
