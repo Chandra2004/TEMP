@@ -19,11 +19,13 @@ use TheFramework\App\Model;
 class Category extends Model
 {
     protected $table = 'categories';
-    protected $primaryKey = 'id_kategori';
+    protected $primaryKey = 'id';
 
     protected $fillable = [
         'uid',
-        'nama_kategori'
+        'nama_kategori',
+        'kode_ku',
+        'slug_kategori'
     ];
 
     protected $hidden = [

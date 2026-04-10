@@ -77,33 +77,27 @@ class AuthController extends Controller
     {
         $data = $request->validated();
         try {
-            $userRole = (new Role())->query()->where('nama_role', '=', 'member')->first();
-            $data['uid_role'] = $userRole ? $userRole->uid : null;
+            // 1. Data Sanitization
+            unset($data['password_confirm']);
+            unset($data['terms']);
+            
             $data['uid'] = Helper::uuid();
             $data['password'] = Helper::hash_password($data['password']);
+            $data['is_active'] = 1;
 
-            $checkEmail = $this->user->checkEmail($data['email']);
-            $checkNomor = $this->user->checkNomor($data['no_telepon']);
+            // Dapatkan Role Atlet secara otomatis (New RBAC)
+            $data['nama_role'] = 'atlet';
 
-            if ($checkEmail != null) {
-                return Helper::redirect('/register', 'error', 'Email sudah terdaftar', 10);
-            } else if ($checkNomor != null) {
-                return Helper::redirect('/register', 'error', 'Nomor telepon sudah terdaftar', 10);
-            } else {
-                unset($data['password_confirm']);
-                unset($data['checkbox']);
-                $this->user->addUser($data);
+            $status = $this->user->addUser($data);
 
-                // Kirim notifikasi ke Admin
-                NotificationController::sendToAdmin(
-                    'Pendaftaran Member Baru',
-                    "Halo Admin, ada member baru baru saja bergabung!<br><br><b>Nama:</b> {$data['nama_lengkap']}<br><b>Email:</b> {$data['email']}<br><br>Silakan cek manajemen pengguna untuk informasi lebih lanjut."
-                );
-
-                return Helper::redirect('/login', 'success', "Berhasil mendaftar, mohon untuk login {$data['nama_lengkap']}", 10);
+            if ($status) {
+                return Helper::redirect('/login', 'success', "Berhasil mendaftar! Selamat datang " . e($data['username']) . ", silakan login.");
             }
+
+            return Helper::redirect('/register', 'error', 'Gagal membuat akun.');
+
         } catch (Exception $e) {
-            return Helper::redirect('/register', 'error', 'terjadi kesalahan: ' . $e->getMessage(), 10);
+            return Helper::redirect('/register', 'error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
 
@@ -219,15 +213,9 @@ class AuthController extends Controller
         }
     }
 
-    public function logout($role, $uidUser)
+    public function logout()
     {
-        $status = $this->user->chechKredensial($role, $uidUser);
-
-        if ($status) {
-            Helper::session_destroy_all();
-            Helper::redirect('/login', 'success', 'selamat tinggal');
-        } else {
-            Helper::redirect('/' . $role . '/dashboard', 'anda siapa??');
-        }
+        Helper::session_destroy_all();
+        return Helper::redirect('/login', 'success', 'Anda telah berhasil keluar. Sampai jumpa kembali!', 5);
     }
 }

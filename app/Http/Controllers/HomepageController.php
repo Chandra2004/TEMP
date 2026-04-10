@@ -30,24 +30,37 @@ class HomepageController extends Controller
             'user' => $this->sessionLogin,
             'notification' => Helper::get_flash('notification'),
             "title" => "Khafid Swimming Club (KSC) - Official Website | Beranda",
-            'events' => Event::query()
-                ->select([
-                    'events.*',
-                    'categories.nama_kategori AS kategori',
-                    'users.nama_lengkap AS author'
-                ])
-                ->join('categories', 'categories.uid', '=', 'events.uid_kategori')
-                ->join('users', 'users.uid', '=', 'events.uid_author')
-                ->limit(2, 0)
-                ->orderBy('tanggal_event', 'desc')
-                ->all(),
+            'events' => (function() {
+                $events = Event::query()
+                    ->select([
+                        'events.*',
+                        'data_users.nama_lengkap AS author'
+                    ])
+                    ->with(['eventCategories.category', 'eventCategories.registrations'])
+                    ->join('users', 'users.uid', '=', 'events.uid_author')
+                    ->join('data_users', 'users.uid', '=', 'data_users.uid_user')
+                    ->limit(2)
+                    ->orderBy('events.tanggal_mulai', 'desc')
+                    ->all();
+                
+                foreach ($events as &$event) {
+                    $count = 0;
+                    if (isset($event['eventCategories'])) {
+                        foreach ($event['eventCategories'] as $cat) {
+                            $count += count($cat['registrations'] ?? []);
+                        }
+                    }
+                    $event['registrations_count'] = $count;
+                }
+                return $events;
+            })(),
             'galleries' => Gallery::query()
                 ->select([
                     'galleries.*',
                     'events.nama_event AS nama_foto'
                 ])
                 ->join('events', 'events.uid', '=', 'galleries.uid_event')
-                ->limit(10, 0)
+                ->limit(10)
                 ->orderBy('created_at', 'desc')
                 ->all()
         ]);
@@ -59,8 +72,13 @@ class HomepageController extends Controller
             'user' => $this->sessionLogin,
             'notification' => Helper::get_flash('notification'),
             'title' => 'Khafid Swimming Club (KSC) - Official Website | Tentang Kami',
-            'mentors' => User::where('uid_role', Role::where('nama_role', 'coach')->first()->uid)
-                ->limit(3, 0)
+            'mentors' => User::query()
+                ->select(['users.*', 'data_users.*'])
+                ->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
+                ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
+                ->join('data_users', 'users.uid', '=', 'data_users.uid_user')
+                ->where('roles.name', '=', 'pelatih')
+                ->limit(3)
                 ->all()
         ]);
     }
@@ -78,9 +96,14 @@ class HomepageController extends Controller
     {
         return View::render('homepage.pelatih', [
             'user' => $this->sessionLogin,
-            'notifikasi' => Helper::get_flash('notification'),
+            'notification' => Helper::get_flash('notification'),
             'title' => 'Khafid Swimming Club (KSC) - Official Website | Pelatih',
-            'mentors' => User::where('uid_role', Role::where('nama_role', 'coach')->first()->uid)
+            'mentors' => User::query()
+                ->select(['users.*', 'data_users.*'])
+                ->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
+                ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
+                ->join('data_users', 'users.uid', '=', 'data_users.uid_user')
+                ->where('roles.name', '=', 'pelatih')
                 ->all()
         ]);
     }
@@ -94,7 +117,19 @@ class HomepageController extends Controller
                 ->orWhere('lokasi_event', 'like', "%{$keyword}%");
         }
 
-        $events = $query->with(['category', 'author'])->withCount(['registrations'])->orderBy("tanggal_event", "DESC")->paginate(9, $page);
+        $pagination = $query->with(['eventCategories.category', 'eventCategories.registrations', 'author'])->orderBy("tanggal_mulai", "DESC")->paginate(9, $page);
+        
+        foreach ($pagination['data'] as &$event) {
+            $count = 0;
+            if (isset($event['eventCategories'])) {
+                foreach ($event['eventCategories'] as $cat) {
+                    $count += count($cat['registrations'] ?? []);
+                }
+            }
+            $event['registrations_count'] = $count;
+        }
+
+        $events = $pagination;
 
         return View::render('homepage.event', [
             'user' => $this->sessionLogin,
@@ -110,24 +145,57 @@ class HomepageController extends Controller
         $event = Event::query()
             ->select([
                 'events.*',
-                'categories.nama_kategori AS kategori',
-                'users.nama_lengkap AS author',
+                'data_users.nama_lengkap AS author',
                 'payment_method.bank',
                 'payment_method.rekening',
                 'payment_method.atas_nama',
                 'payment_method.photo',
             ])
-            ->withCount(['registrations'])
-            ->join('categories', 'events.uid_kategori', '=', 'categories.uid')
+            ->with(['eventCategories.category', 'eventCategories.registrations'])
             ->join('users', 'events.uid_author', '=', 'users.uid')
+            ->join('data_users', 'users.uid', '=', 'data_users.uid_user')
             ->join('payment_method', 'events.uid_payment_method', '=', 'payment_method.uid', 'LEFT')
             ->where('events.slug', '=', $slug)->where('events.uid', '=', $uid)->first();
+
+        $profileCompletion = ['complete' => false, 'percentage' => 0];
+        $registeredCategoryUids = [];
+
+        if ($this->sessionLogin) {
+            $userModel = new User();
+            $profileCompletion = $userModel->getProfileCompletion($this->sessionLogin['uid']);
+
+            // Dapatkan list UID kategori yang sudah didaftarkan user di event ini
+            $registeredCats = (new \TheFramework\App\QueryBuilder(\TheFramework\App\Database::getInstance()))
+                ->table('registrations')
+                ->select(['registrations.uid_event_category'])
+                ->join('event_categories', 'registrations.uid_event_category', '=', 'event_categories.uid')
+                ->where('registrations.uid_user', '=', $this->sessionLogin['uid'])
+                ->where('event_categories.uid_event', '=', $uid)
+                ->get();
+            
+            if ($registeredCats) {
+                foreach ($registeredCats as $reg) {
+                    $registeredCategoryUids[] = $reg['uid_event_category'];
+                }
+            }
+        }
 
         return View::render('homepage.event-detail', [
             'user' => $this->sessionLogin,
             'notification' => Helper::get_flash('notification'),
             'title' => "Khafid Swimming Club (KSC) - Official Website | " . $event['nama_event'],
-            'event' => $event
+            'event' => (function($event) {
+                $count = 0;
+                if (isset($event['eventCategories'])) {
+                    foreach ($event['eventCategories'] as $cat) {
+                        $count += count($cat['registrations'] ?? []);
+                    }
+                }
+                $event['registrations_count'] = $count;
+                return $event;
+            })($event),
+            'profileCompletion' => $profileCompletion,
+            'registeredCategoryUids' => $registeredCategoryUids
         ]);
     }
 

@@ -2,16 +2,16 @@
 
 @section('dashboard-section')
     <div class="p-4 md:p-8 overflow-y-auto">
-        <div class="flex justify-between items-center mb-6">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
             <div>
-                <h2 class="text-2xl font-bold text-slate-900 leading-tight">Manajemen Kategori</h2>
-                <p class="text-sm text-slate-500">Kelola kategori produk untuk sistem inventaris</p>
+                <h2 class="text-3xl font-extrabold text-slate-900 leading-tight tracking-tight">Master Data Gaya Renang</h2>
+                <p class="text-sm text-slate-500 mt-1 font-medium">Definisikan jenis lomba dan gaya renang yang akan digunakan dalam event.</p>
             </div>
             <button data-modal-target="modal-tambah-kategori" data-modal-toggle="modal-tambah-kategori"
-                class="flex items-center gap-2 bg-ksc-blue hover:bg-ksc-dark text-white px-4 py-2.5 rounded-lg font-semibold transition shadow-sm focus:ring-4 focus:ring-blue-300"
+                class="flex items-center gap-2 bg-ksc-blue hover:bg-ksc-dark text-white px-5 py-3 rounded-xl font-bold transition-all shadow-lg shadow-blue-100 hover:shadow-blue-200 active:scale-95 group"
                 type="button">
-                <i data-lucide="plus" class="w-5 h-5"></i>
-                <span>Tambah Kategori</span>
+                <i data-lucide="award" class="w-5 h-5 group-hover:rotate-12 transition"></i>
+                <span>Tambah Gaya Baru</span>
             </button>
         </div>
 
@@ -110,7 +110,7 @@
     </div>
 
     <div id="modal-tambah-kategori" tabindex="-1" aria-hidden="true"
-        class="hidden fixed top-0 left-0 right-0 z-[70] w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-full max-h-full flex items-center justify-center bg-slate-900/60 backdrop-blur-sm transition-opacity">
+        class="hidden fixed top-0 left-0 right-0 z-[70] w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-full max-h-full items-center justify-center bg-slate-900/60 backdrop-blur-sm transition-opacity">
         <div class="relative w-full max-w-md max-h-full">
             <div class="relative bg-white rounded-lg shadow-2xl border border-slate-200">
                 <div class="flex items-center justify-between p-4 md:p-5 border-b border-slate-100 rounded-t">
@@ -148,7 +148,7 @@
 
     @foreach ($categories['data'] as $category)
         <div id="modal-edit-kategori-{{ $category['uid'] }}" tabindex="-1" aria-hidden="true"
-            class="hidden fixed top-0 left-0 right-0 z-[70] w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-full max-h-full flex items-center justify-center bg-slate-900/60 backdrop-blur-sm transition-opacity">
+            class="hidden fixed top-0 left-0 right-0 z-[70] w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-full max-h-full items-center justify-center bg-slate-900/60 backdrop-blur-sm transition-opacity">
             <div class="relative w-full max-w-md max-h-full">
                 <div class="relative bg-white rounded-lg shadow-2xl border border-slate-200">
                     <div class="flex items-center justify-between p-4 md:p-5 border-b border-slate-100 rounded-t">
@@ -183,7 +183,7 @@
         </div>
 
         <div id="modal-hapus-kategori-{{ $category['uid'] }}" tabindex="-1" aria-hidden="true"
-            class="hidden fixed top-0 left-0 right-0 z-[70] w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-full max-h-full flex items-center justify-center bg-slate-900/60 backdrop-blur-sm transition-opacity">
+            class="hidden fixed top-0 left-0 right-0 z-[70] w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-full max-h-full items-center justify-center bg-slate-900/60 backdrop-blur-sm transition-opacity">
             <div class="relative w-full max-w-sm max-h-full">
                 <div class="relative bg-white rounded-lg shadow-2xl border border-slate-200">
                     <div class="p-4 md:p-6 text-center">

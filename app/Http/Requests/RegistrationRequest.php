@@ -44,14 +44,16 @@ class RegistrationRequest extends FormRequest
             $rules = [
                 'uid_user' => 'required|min:36',
                 'uid_event' => 'required|min:36',
+                'uid_event_category' => 'required',
                 'metode_pembayaran' => 'nullable',
-                'bukti_pembayaran' => 'nullable|mimes:jpg,png,jpeg|max:1024'
+                'total_bayar' => 'nullable',
+                'bukti_pembayaran' => 'nullable|mimes:jpg,png,jpeg|max:2048'
             ];
         } else if (Helper::getUriSegment(6) === 'edit') {
             $rules = [
                 'status_pembayaran' => 'nullable',
                 'catatan_admin' => 'nullable',
-                'status' => 'nullable',
+                'status_pendaftaran' => 'nullable',
 
             ];
         }

@@ -3,508 +3,221 @@
 <style>
     /* Custom Scrollbar */
     ::-webkit-scrollbar {
-        width: 8px;
+        width: 6px;
     }
-
     ::-webkit-scrollbar-track {
-        background: #f1f1f1;
+        background: #f1f5f9;
     }
-
     ::-webkit-scrollbar-thumb {
-        background: #94a3b8;
-        border-radius: 4px;
+        background: #cbd5e1;
+        border-radius: 10px;
     }
 
-    ::-webkit-scrollbar-thumb:hover {
-        background: #64748b;
+    .event-card {
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
-
-    /* Glass Effect & Hover */
-    .glass-card {
-        background: rgba(255, 255, 255, 0.03);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+    .event-card:hover {
+        transform: translateY(-12px);
     }
-
-    .event-card-hover {
-        transition: all 0.3s ease;
+    .glass-effect {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
     }
-
-    .event-card-hover:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+    .text-gradient {
+        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
     }
-
-    /* Animation */
-    .reveal {
-        opacity: 0;
-        transform: translateY(30px);
-        transition: all 0.8s ease-out;
-    }
-
-    .reveal.active {
-        opacity: 1;
-        transform: translateY(0);
-    }
-
-    .scrollbar-hide::-webkit-scrollbar {
-        display: none;
-    }
-
-    .scrollbar-hide {
-        -ms-overflow-style: none;
-        scrollbar-width: none;
+    .bg-grid {
+        background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+        background-size: 30px 30px;
     }
 </style>
 
 @section('homepage-section')
-    <section class="relative pt-32 pb-20 bg-hero-lomba bg-cover bg-center bg-slate-900">
-        <div class="container mx-auto px-6 relative z-10 text-center text-white">
-            <div
-                class="inline-block px-4 py-1.5 bg-ksc-accent/20 backdrop-blur-md border border-ksc-accent/30 rounded-full text-ksc-accent font-bold text-xs mb-6 uppercase tracking-widest">
-                Arena Kompetisi
+    {{-- Header Section --}}
+    <section class="relative pt-40 pb-24 bg-slate-950 overflow-hidden">
+        <div class="absolute inset-0 bg-grid opacity-10"></div>
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-gradient-to-b from-blue-600/20 to-transparent blur-3xl"></div>
+        
+        <div class="container mx-auto px-6 relative z-10 text-center">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold uppercase tracking-widest mb-8 animate-fade-in">
+                <span class="relative flex h-2 w-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                </span>
+                Arena Kompetisi KSC
             </div>
-            <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-                Tunjukkan Kemampuanmu <br>
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-ksc-accent to-yellow-200">Raih Podium
-                    Juara.</span>
+            <h1 class="text-5xl md:text-7xl font-black text-white mb-8 leading-tight">
+                Temukan <span class="text-blue-500 italic">Passion</span> & <br>
+                Raih <span class="relative">
+                    <span class="relative z-10 text-yellow-400">Podium Juara</span>
+                    <svg class="absolute -bottom-2 left-0 w-full" viewBox="0 0 318 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 10C55.5 4 115 1.5 174 1.5C233 1.5 292.5 4 317 10" stroke="#FACC15" stroke-width="3" stroke-linecap="round"/></svg>
+                </span>
             </h1>
-            <p class="text-slate-300 text-lg max-w-2xl mx-auto mb-10">
-                Jadwal lengkap kompetisi renang internal dan terbuka. Daftarkan dirimu dan jadilah bagian dari sejarah
-                prestasi KSC.
+            <p class="text-slate-400 text-lg max-w-2xl mx-auto mb-12 leading-relaxed">
+                Jelajahi berbagai kompetisi renang bergengsi. Dari tingkat internal hingga terbuka, saatnya buktikan hasil latihanmu di sini.
             </p>
-        </div>
-    </section>
 
-    <section class="py-8 bg-white sticky top-[72px] z-40 border-b border-slate-100">
-        <div class="container mx-auto px-6">
-            <div class="flex flex-col gap-8" id="event-filter-bar">
-                <div class="relative w-full max-w-5xl mx-auto group">
-                    <div class="absolute left-7 top-1/2 -translate-y-1/2 z-10">
-                        <i data-lucide="search" class="w-6 h-6 text-ksc-blue"></i>
+            {{-- Search Bar --}}
+            <div class="relative max-w-3xl mx-auto group">
+                <div class="absolute -inset-1 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-[2.5rem] blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
+                <div class="relative flex items-center bg-slate-900 border border-slate-800 rounded-[2.5rem] p-2">
+                    <div class="pl-6 pr-4">
+                        <i data-lucide="search" class="w-6 h-6 text-slate-500"></i>
                     </div>
-
-                    <input type="text" id="eventSearchInput" placeholder="CARI NAMA LOMBA ATAU LOKASI KOMPETISI..."
-                        class="w-full bg-slate-50 border border-slate-200 rounded-[2rem] py-5 pl-16 pr-8 text-sm font-bold tracking-wider text-slate-800 outline-none transition-all focus:bg-white focus:ring-[12px] focus:ring-ksc-blue/5 focus:border-ksc-blue/40 placeholder:text-slate-400 uppercase">
+                    <input type="text" id="eventSearchInput" value="{{ $currentKeyword ?? '' }}" placeholder="Cari nama event atau lokasi kompetisi..."
+                        class="w-full bg-transparent border-none text-white text-sm font-medium focus:ring-0 placeholder:text-slate-600 py-4">
+                    <button class="bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-[2rem] font-bold text-sm transition-all shadow-lg shadow-blue-600/20 mr-1">
+                        Cari Sekarang
+                    </button>
                 </div>
-
             </div>
         </div>
     </section>
 
-    <section class="py-20 overflow-hidden bg-slate-50/50">
+    {{-- Events Grid --}}
+    <section class="py-32 bg-white relative">
         <div class="container mx-auto px-6">
-            <div class="grid lg:grid-cols-3 md:grid-cols-2 gap-8">
-                @foreach ($events['data'] as $event)
-                    @if ($event['status_event'] === 'berjalan')
-                        @if ($event['tipe_event'] === 'berbayar')
-                            <div class="event-card group bg-white rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-2xl hover:shadow-slate-200 transition-all duration-300 overflow-hidden flex flex-col"
-                                data-status="berjalan">
-                                <div class="relative h-48 overflow-hidden">
-                                    @if ($event->banner_event === null)
-                                        <img src="https://lh5.googleusercontent.com/proxy/t08n2HuxPfw8OpbutGWjekHAgxfPFv-pZZ5_-uTfhEGK8B5Lp-VN4VjrdxKtr8acgJA93S14m9NdELzjafFfy13b68pQ7zzDiAmn4Xg8LvsTw1jogn_7wStYeOx7ojx5h63Gliw"
-                                            alt="Banner Event" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                                    @else
-                                        <img src="{{ url('/file/banner-event/' . $event['banner_event']) }}"
-                                            alt="Banner Event" class="w-16 h-10 object-cover rounded">
+            <div class="grid lg:grid-cols-3 md:grid-cols-2 gap-10">
+                @forelse ($events['data'] as $event)
+                    <div class="event-card group bg-white rounded-[3rem] border border-slate-100 shadow-xl shadow-slate-200/40 overflow-hidden flex flex-col h-full ring-1 ring-slate-100">
+                        {{-- Banner Area --}}
+                        <div class="relative h-64 overflow-hidden">
+                            @if ($event->banner_event)
+                                <img src="{{ url('/file/banner-event/' . $event['banner_event']) }}"
+                                    class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                            @else
+                                <div class="w-full h-full bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center">
+                                    <i data-lucide="image" class="w-12 h-12 text-slate-300"></i>
+                                </div>
+                            @endif
+
+                            {{-- Badges --}}
+                            <div class="absolute top-6 left-6 flex flex-col gap-2">
+                                <span class="px-4 py-1.5 glass-effect rounded-full text-[10px] font-black uppercase tracking-widest text-slate-900 shadow-sm">
+                                    {{ $event['eventCategories'][0]['category']['nama_kategori'] ?? 'Swimming' }}
+                                </span>
+                                @if($event['status_event'] === 'berjalan')
+                                    <span class="px-4 py-1.5 bg-emerald-500 text-white rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg shadow-emerald-500/30">
+                                        Open Registration
+                                    </span>
+                                @else
+                                    <span class="px-4 py-1.5 bg-slate-800 text-white rounded-full text-[10px] font-black uppercase tracking-widest">
+                                        {{ $event['status_event'] }}
+                                    </span>
+                                @endif
+                            </div>
+
+                            {{-- Cost Badge --}}
+                            <div class="absolute bottom-6 right-6">
+                                <div class="px-5 py-2 {{ $event['biaya_event'] > 0 ? 'bg-white' : 'bg-ksc-accent' }} rounded-2xl shadow-xl flex items-center gap-2 border border-white/50">
+                                    <span class="text-[10px] font-black uppercase {{ $event['biaya_event'] > 0 ? 'text-slate-400' : 'text-slate-900' }}">
+                                        {{ $event['biaya_event'] > 0 ? 'Investasi' : 'Free' }}
+                                    </span>
+                                    @if($event['biaya_event'] > 0)
+                                        <span class="text-sm font-black text-slate-900 italic">Rp{{ number_format($event['biaya_event'], 0, ',', '.') }}</span>
                                     @endif
-                                    <div class="absolute top-4 left-4 flex gap-2">
-                                        <span
-                                            class="px-3 py-1 bg-ksc-accent text-slate-900 text-[10px] font-black uppercase rounded-full shadow-lg">Berbayar</span>
-                                        <span
-                                            class="px-3 py-1 bg-emerald-500 text-white text-[10px] font-black uppercase rounded-full shadow-lg">Berjalan</span>
-                                    </div>
-                                </div>
-
-                                <div class="p-6 flex-grow">
-                                    <div class="flex justify-between items-start mb-2">
-                                        <p class="text-[10px] font-bold text-ksc-blue uppercase tracking-widest">
-                                            {{ $event['category']['nama_kategori'] }}</p>
-                                        <div class="flex items-center gap-1 text-slate-500">
-                                            <i data-lucide="clock" class="w-3 h-3 text-ksc-blue"></i>
-                                            <span
-                                                class="text-[10px] font-black">{{ \Carbon\Carbon::parse($event['waktu_event'])->translatedFormat('H:m') }}
-                                                WIB</span>
-                                        </div>
-                                    </div>
-                                    <h3
-                                        class="text-xl font-black text-slate-900 leading-tight mb-4 group-hover:text-ksc-blue transition-colors line-clamp-2">
-                                        {{ $event['nama_event'] }}</h3>
-
-                                    <div class="mb-6 bg-slate-50 p-3 rounded-2xl border border-slate-100">
-                                        <div class="flex justify-between text-[10px] font-black uppercase mb-1.5">
-                                            <span class="text-slate-400">Kuota Peserta</span>
-                                            <span
-                                                class="text-ksc-blue">{{ $event['registrations_count'] }}/{{ $event['kuota_peserta'] }}
-                                                Tersedia</span>
-                                        </div>
-                                        <div class="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
-                                            <div class="bg-ksc-blue h-full rounded-full"
-                                                style="width: {{ ($event['registrations_count'] / $event['kuota_peserta']) * 100 }}%">
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="flex items-center justify-between pt-4 border-t border-slate-50">
-                                        <div>
-                                            <p class="text-[9px] font-bold text-slate-400 uppercase italic">Investasi</p>
-                                            <p class="text-lg font-black text-slate-900">{{ rupiah($event['biaya_event']) }}
-                                            </p>
-                                        </div>
-                                        <a href="{{ url('/detail-event/' . $event['slug'] . '/' . $event['uid']) }}"
-                                            class="w-12 h-12 bg-slate-900 text-white rounded-2xl flex items-center justify-center group-hover:bg-ksc-blue transition-all active:scale-90">
-                                            <i data-lucide="arrow-right" class="w-6 h-6"></i>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        @else
-                            <div class="event-card group bg-white rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-2xl hover:shadow-slate-200 transition-all duration-300 overflow-hidden flex flex-col"
-                                data-status="berjalan">
-                                <div class="relative h-48 overflow-hidden">
-                                    <img src="{{ url('/file/banner-event/' . $event['banner_event']) }}"
-                                        class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                                    <div class="absolute top-4 left-4 flex gap-2">
-                                        <span
-                                            class="px-3 py-1 bg-ksc-accent text-slate-900 text-[10px] font-black uppercase rounded-full shadow-lg">Gratis</span>
-                                        <span
-                                            class="px-3 py-1 bg-emerald-500 text-white text-[10px] font-black uppercase rounded-full shadow-lg">Berjalan</span>
-                                    </div>
-                                </div>
-
-                                <div class="p-6 flex-grow">
-                                    <div class="flex justify-between items-start mb-2">
-                                        <p class="text-[10px] font-bold text-ksc-blue uppercase tracking-widest">
-                                            {{ $event['category']['nama_kategori'] }}</p>
-                                        <div class="flex items-center gap-1 text-slate-500">
-                                            <i data-lucide="clock" class="w-3 h-3 text-ksc-blue"></i>
-                                            <span
-                                                class="text-[10px] font-black">{{ \Carbon\Carbon::parse($event['waktu_event'])->translatedFormat('H:m') }}
-                                                WIB</span>
-                                        </div>
-                                    </div>
-                                    <h3
-                                        class="text-xl font-black text-slate-900 leading-tight mb-4 group-hover:text-ksc-blue transition-colors line-clamp-2">
-                                        {{ $event['nama_event'] }}</h3>
-
-                                    <div class="mb-6 bg-slate-50 p-3 rounded-2xl border border-slate-100">
-                                        <div class="flex justify-between text-[10px] font-black uppercase mb-1.5">
-                                            <span class="text-slate-400">Kuota Peserta</span>
-                                            <span
-                                                class="text-ksc-blue">{{ $event['registrations_count'] }}/{{ $event['kuota_peserta'] }}
-                                                Tersedia</span>
-                                        </div>
-                                        <div class="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
-                                            <div class="bg-ksc-blue h-full rounded-full"
-                                                style="width: {{ ($event['registrations_count'] / $event['kuota_peserta']) * 100 }}%">
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="flex items-center justify-between pt-4 border-t border-slate-50">
-                                        <div>
-                                            <p class="text-[9px] font-bold text-slate-400 uppercase italic">Investasi</p>
-                                            <p class="text-lg font-black text-green-500">GRATIS</p>
-                                        </div>
-                                        <a href="{{ url('/detail-event/' . $event['slug'] . '/' . $event['uid']) }}"
-                                            class="w-12 h-12 bg-slate-900 text-white rounded-2xl flex items-center justify-center group-hover:bg-ksc-blue transition-all active:scale-90">
-                                            <i data-lucide="arrow-right" class="w-6 h-6"></i>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        @endif
-                    @endif
-                    @if ($event['status_event'] === 'ditunda')
-                        <div class="event-card group bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden flex flex-col"
-                            data-status="ditunda">
-                            <div class="relative h-48 overflow-hidden">
-                                <img src="{{ url('/file/banner-event/' . $event['banner_event']) }}"
-                                    class="w-full h-full object-cover grayscale opacity-50">
-                                <div class="absolute top-4 left-4 flex gap-2">
-                                    <span
-                                        class="px-3 py-1 bg-white text-slate-900 text-[10px] font-black uppercase rounded-full shadow-sm">{{ $event['tipe_event'] }}</span>
-                                    <span
-                                        class="px-3 py-1 bg-orange-500 text-white text-[10px] font-black uppercase rounded-full shadow-lg">Ditunda</span>
-                                </div>
-                            </div>
-
-                            <div class="p-6 flex-grow bg-slate-50/30">
-                                <div class="flex justify-between items-start mb-2">
-                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                                        {{ $event['category']['nama_kategori'] }}</p>
-                                    <div class="flex items-center gap-1 text-slate-400">
-                                        <i data-lucide="clock" class="w-3 h-3"></i>
-                                        <span
-                                            class="text-[10px] font-black">{{ \Carbon\Carbon::parse($event['waktu_event'])->translatedFormat('H:m') }}
-                                            WIB</span>
-                                    </div>
-                                </div>
-                                <h3 class="text-xl font-black text-slate-400 leading-tight mb-4 line-clamp-2">
-                                    {{ $event['nama_event'] }}
-                                </h3>
-
-                                <div class="mb-6 opacity-40">
-                                    <div
-                                        class="flex justify-between text-[10px] font-black uppercase mb-1.5 text-slate-400">
-                                        <span>Kuota Peserta</span>
-                                        <span>{{ $event['registrations_count'] }}/{{ $event['kuota_peserta'] }}
-                                            Tersedia</span>
-                                    </div>
-                                    <div class="mb-6 bg-slate-50 p-3 rounded-2xl border border-slate-100">
-                                        <div
-                                            class="flex justify-between text-[10px] font-black uppercase mb-1.5 text-slate-600">
-                                            <span>Status Kuota</span>
-                                            <span>Ditunda</span>
-                                        </div>
-                                        <div class="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
-                                            <div class="bg-slate-500 h-full rounded-full" style="width: 100%"></div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="flex items-center justify-between pt-4 border-t border-slate-200">
-                                    <span class="text-[10px] italic font-black text-orange-600 uppercase">Menunggu
-                                        Jadwal</span>
-                                    <button disabled
-                                        class="w-12 h-12 bg-slate-100 text-slate-300 rounded-2xl flex items-center justify-center cursor-not-allowed">
-                                        <i data-lucide="lock" class="w-6 h-6"></i>
-                                    </button>
                                 </div>
                             </div>
                         </div>
-                    @endif
-                    @if ($event['status_event'] === 'ditutup')
-                        <div class="event-card group bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden flex flex-col"
-                            data-status="ditutup">
-                            <div class="relative h-48 overflow-hidden grayscale opacity-75">
-                                <img src="{{ url('/file/banner-event/' . $event['banner_event']) }}"
-                                    class="w-full h-full object-cover">
-                                <div class="absolute top-4 left-4 flex gap-2">
-                                    <span
-                                        class="px-3 py-1 bg-white text-slate-900 text-[10px] font-black uppercase rounded-full">{{ $event['tipe_event'] }}</span>
-                                    <span
-                                        class="px-3 py-1 bg-slate-800 text-white text-[10px] font-black uppercase rounded-full">Ditutup</span>
+
+                        {{-- Content Area --}}
+                        <div class="p-10 flex-grow flex flex-col">
+                            <div class="flex items-center gap-3 mb-6 text-slate-400">
+                                <div class="flex items-center gap-1.5">
+                                    <i data-lucide="calendar" class="w-4 h-4 text-blue-500"></i>
+                                    <span class="text-[11px] font-bold uppercase tracking-wider">
+                                        {{ \Carbon\Carbon::parse($event['tanggal_mulai'])->translatedFormat('d M Y') }}
+                                    </span>
+                                </div>
+                                <div class="w-1 h-1 bg-slate-300 rounded-full"></div>
+                                <div class="flex items-center gap-1.5">
+                                    <i data-lucide="map-pin" class="w-4 h-4 text-rose-500"></i>
+                                    <span class="text-[11px] font-bold uppercase tracking-wider truncate max-w-[120px]">
+                                        {{ $event['lokasi_event'] }}
+                                    </span>
                                 </div>
                             </div>
 
-                            <div class="p-6 flex-grow">
-                                <div class="flex justify-between items-start mb-2">
-                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                                        {{ $event['category']['nama_kategori'] }}</p>
-                                    <div class="flex items-center gap-1 text-slate-400">
-                                        <i data-lucide="clock" class="w-3 h-3"></i>
-                                        <span class="text-[10px] font-black">Selesai</span>
-                                    </div>
-                                </div>
-                                <h3 class="text-xl font-black text-slate-900 leading-tight mb-4 line-clamp-2">
-                                    {{ $event['nama_event'] }}</h3>
+                            <h3 class="text-2xl font-black text-slate-900 leading-tight mb-6 group-hover:text-blue-600 transition-colors line-clamp-2 italic uppercase">
+                                {{ $event['nama_event'] }}
+                            </h3>
 
-                                <div class="mb-6 bg-red-50 p-3 rounded-2xl border border-red-100">
-                                    <div class="flex justify-between text-[10px] font-black uppercase mb-1.5 text-red-600">
-                                        <span>Status Kuota</span>
-                                        <span>Penuh</span>
-                                    </div>
-                                    <div class="w-full bg-red-200 h-1.5 rounded-full overflow-hidden">
-                                        <div class="bg-red-500 h-full rounded-full" style="width: 100%"></div>
-                                    </div>
+                            {{-- Features / Info --}}
+                            <div class="flex flex-wrap gap-4 mb-10 mt-auto">
+                                <div class="flex items-center gap-2 bg-slate-50 px-4 py-2 rounded-xl border border-slate-100">
+                                    <i data-lucide="layout" class="w-4 h-4 text-blue-500"></i>
+                                    <span class="text-[10px] font-bold text-slate-600 uppercase">{{ $event['jumlah_lintasan'] ?? 8 }} LINTASAN</span>
                                 </div>
-
-                                <div class="flex items-center justify-between pt-4 border-t border-slate-50">
-                                    <span class="text-[10px] font-black text-red-500 italic uppercase">Pendaftaran
-                                        Berakhir</span>
-                                    <div
-                                        class="w-12 h-12 bg-slate-50 text-slate-300 rounded-2xl flex items-center justify-center">
-                                        <i data-lucide="ban" class="w-6 h-6"></i>
-                                    </div>
+                                <div class="flex items-center gap-2 bg-slate-50 px-4 py-2 rounded-xl border border-slate-100">
+                                    <i data-lucide="users" class="w-4 h-4 text-blue-500"></i>
+                                    <span class="text-[10px] font-bold text-slate-600 uppercase">{{ $event['registrations_count'] }} PESERTA</span>
                                 </div>
                             </div>
+
+                            <a href="{{ url('/detail-event/' . $event['slug'] . '/' . $event['uid']) }}"
+                                class="w-full py-5 bg-slate-900 hover:bg-blue-600 text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 group/btn shadow-xl shadow-slate-200 hover:shadow-blue-500/30">
+                                Lihat Detail <i data-lucide="arrow-right" class="w-5 h-5 group-hover/btn:translate-x-1 transition-transform"></i>
+                            </a>
                         </div>
-                    @endif
-                @endforeach
+                    </div>
+                @empty
+                    <div class="lg:col-span-3 py-20 text-center">
+                        <div class="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <i data-lucide="calendar-x" class="w-10 h-10 text-slate-300"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-400 uppercase tracking-widest">Belum Ada Event Ditemukan</h3>
+                    </div>
+                @endforelse
             </div>
-            @php
-                // Cek apakah ada keyword dari controller (sesuaikan variabelnya)
-                $keyword = $currentKeyword ?? null;
 
-                // Tentukan base URL: jika ada keyword pakai format search, jika tidak pakai standar
-                $paginationPath = $keyword ? '/events/search/' . urlencode($keyword) . '/page/' : '/events/page/';
-            @endphp
-
-            <div class="mt-6 flex flex-col md:flex-row items-center justify-between gap-4 px-2 pb-10">
-                <div class="text-left">
-                    <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
-                        Halaman <span class="text-slate-900">{{ $events['current_page'] }}</span>
-                        dari <span class="text-slate-900">{{ $events['last_page'] }}</span>
-                        — Total <span class="text-ksc-blue">{{ $events['total'] }}</span> Event
-                        @if ($keyword)
-                            <span class="text-rose-500 italic"> (Hasil Pencarian: "{{ $keyword }}")</span>
-                        @endif
-                    </p>
-                </div>
-
-                <div class="flex items-center gap-2">
-                    {{-- Tombol Prev --}}
+            {{-- Pagination --}}
+            @if ($events['last_page'] > 1)
+                @php
+                    $paginationPath = ($currentKeyword ?? null) ? '/events/search/' . urlencode($currentKeyword) . '/page/' : '/events/page/';
+                @endphp
+                <div class="mt-24 flex items-center justify-center gap-4">
                     @if ($events['current_page'] > 1)
                         <a href="{{ url($paginationPath . ($events['current_page'] - 1)) }}"
-                            class="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 text-slate-600 rounded-xl font-bold text-xs hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm active:scale-95">
-                            <i data-lucide="chevron-left" class="w-4 h-4 text-slate-400"></i>
-                            <span>Prev</span>
+                            class="w-14 h-14 bg-white border border-slate-200 text-slate-600 rounded-2xl flex items-center justify-center hover:bg-slate-50 transition shadow-sm">
+                            <i data-lucide="chevron-left" class="w-6 h-6"></i>
                         </a>
-                    @else
-                        <div
-                            class="flex items-center gap-2 px-4 py-2.5 bg-slate-50 border border-slate-100 text-slate-300 rounded-xl font-bold text-xs cursor-not-allowed opacity-60">
-                            <i data-lucide="chevron-left" class="w-4 h-4"></i>
-                            <span>Prev</span>
-                        </div>
                     @endif
 
-                    {{-- Indikator Halaman --}}
-                    <div class="flex items-center bg-white border border-slate-200 rounded-xl px-4 py-2.5 shadow-sm">
-                        <span class="text-xs font-black text-slate-900">{{ $events['current_page'] }}</span>
+                    <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-2xl border border-slate-100">
+                        @for ($i = 1; $i <= $events['last_page']; $i++)
+                            <a href="{{ url($paginationPath . $i) }}"
+                                class="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-black transition-all {{ $events['current_page'] == $i ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30' : 'text-slate-400 hover:text-slate-900' }}">
+                                {{ $i }}
+                            </a>
+                        @endfor
                     </div>
 
-                    {{-- Tombol Next --}}
                     @if ($events['current_page'] < $events['last_page'])
                         <a href="{{ url($paginationPath . ($events['current_page'] + 1)) }}"
-                            class="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 text-slate-600 rounded-xl font-bold text-xs hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm active:scale-95">
-                            <span>Next</span>
-                            <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+                            class="w-14 h-14 bg-white border border-slate-200 text-slate-600 rounded-2xl flex items-center justify-center hover:bg-slate-50 transition shadow-sm">
+                            <i data-lucide="chevron-right" class="w-6 h-6"></i>
                         </a>
-                    @else
-                        <div
-                            class="flex items-center gap-2 px-4 py-2.5 bg-slate-50 border border-slate-100 text-slate-300 rounded-xl font-bold text-xs cursor-not-allowed opacity-60">
-                            <span>Next</span>
-                            <i data-lucide="chevron-right" class="w-4 h-4"></i>
-                        </div>
                     @endif
                 </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="py-24 bg-slate-900 relative overflow-hidden">
-        <div class="container mx-auto px-6 relative z-10">
-            <div class="text-center max-w-2xl mx-auto mb-20">
-                <span class="text-ksc-accent font-bold tracking-widest text-xs uppercase">Workflow</span>
-                <h2 class="text-4xl font-bold text-white mt-2 leading-tight">Bagaimana Cara <br> Mendaftar Kompetisi?</h2>
-            </div>
-
-            <div class="grid md:grid-cols-4 gap-12 text-left">
-                <div class="relative group">
-                    <div
-                        class="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center text-ksc-accent mb-8 border border-white/5 transition group-hover:bg-ksc-accent group-hover:text-slate-900 shadow-xl">
-                        <i data-lucide="search" class="w-8 h-8"></i>
-                    </div>
-                    <h5 class="text-white font-bold mb-3 text-lg">1. Pilih Event</h5>
-                    <p class="text-slate-400 text-sm leading-relaxed">Cari kompetisi yang sesuai dengan kategori umur dan
-                        spesialisasi teknik renangmu.</p>
-                </div>
-                <div class="relative group">
-                    <div
-                        class="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center text-ksc-accent mb-8 border border-white/5 transition group-hover:bg-ksc-accent group-hover:text-slate-900 shadow-xl">
-                        <i data-lucide="file-text" class="w-8 h-8"></i>
-                    </div>
-                    <h5 class="text-white font-bold mb-3 text-lg">2. Isi Formulir</h5>
-                    <p class="text-slate-400 text-sm leading-relaxed">Lengkapi profil peserta, pilih nomor lomba, dan
-                        unggah
-                        dokumen persyaratan wajib.</p>
-                </div>
-                <div class="relative group">
-                    <div
-                        class="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center text-ksc-accent mb-8 border border-white/5 transition group-hover:bg-ksc-accent group-hover:text-slate-900 shadow-xl">
-                        <i data-lucide="credit-card" class="w-8 h-8"></i>
-                    </div>
-                    <h5 class="text-white font-bold mb-3 text-lg">3. Pembayaran</h5>
-                    <p class="text-slate-400 text-sm leading-relaxed">Lakukan pembayaran biaya registrasi via transfer bank
-                        sesuai nominal yang tertera.</p>
-                </div>
-                <div class="relative group">
-                    <div
-                        class="w-16 h-16 bg-ksc-accent rounded-2xl flex items-center justify-center text-slate-900 mb-8 shadow-2xl transition group-hover:scale-110">
-                        <i data-lucide="check-circle" class="w-8 h-8"></i>
-                    </div>
-                    <h5 class="text-white font-bold mb-3 text-lg">4. Konfirmasi</h5>
-                    <p class="text-slate-400 text-sm leading-relaxed">Admin akan memvalidasi data Anda. E-Card resmi akan
-                        dikirim melalui dashboard Anda.</p>
-                </div>
-            </div>
+            @endif
         </div>
     </section>
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            // 1. REVEAL ANIMATION (Muncul saat scroll)
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add("active");
-                    }
-                });
-            }, {
-                threshold: 0.1
-            });
-
-            document.querySelectorAll(".reveal").forEach(el => observer.observe(el));
-
-            // 2. KONFIGURASI KELAS CSS (Tailwind)
-            const activeClass =
-                "filter-btn snap-start px-6 py-2 bg-ksc-blue text-white rounded-full text-sm font-bold shadow-lg shadow-ksc-blue/20 whitespace-nowrap transition-all duration-300";
-            const inactiveClass =
-                "filter-btn snap-start px-6 py-2 bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-300";
-
-            // 3. INISIALISASI SWIPER
-            const eventSwiper = new Swiper('.swiper-event', {
-                slidesPerView: 1,
-                spaceBetween: 40,
-                autoHeight: true,
-                speed: 700,
-                allowTouchMove: true,
-                on: {
-                    slideChange: function() {
-                        const buttons = document.querySelectorAll('#event-filter-bar .filter-btn');
-                        buttons.forEach((btn, idx) => {
-                            if (idx === this.activeIndex) {
-                                btn.className = activeClass;
-                                btn.scrollIntoView({
-                                    behavior: 'smooth',
-                                    inline: 'center',
-                                    block: 'nearest'
-                                });
-                            } else {
-                                btn.className = inactiveClass;
-                            }
-                        });
-                    }
-                }
-            });
-
-            // 4. NAVIGASI TOMBOL KE SLIDE
-            window.goToEventSlide = function(index) {
-                eventSwiper.slideTo(index);
-            };
-
-            // 5. LIVE SEARCH
             const searchInput = document.getElementById('eventSearchInput');
-
             if (searchInput) {
                 searchInput.addEventListener('keypress', function(e) {
                     if (e.key === 'Enter') {
                         const term = e.target.value.trim();
-                        if (term !== "") {
-                            // Redirect ke URL cantik: /events/search/ternate
-                            window.location.href = `/events/search/${encodeURIComponent(term)}`;
-                        } else {
-                            window.location.href = `/events`;
-                        }
+                        window.location.href = term !== "" ? `/events/search/${encodeURIComponent(term)}` : `/events`;
                     }
                 });
             }
-
-            // Inisialisasi Lucide Icons
-            if (typeof lucide !== 'undefined') {
-                lucide.createIcons();
-            }
+            if (typeof lucide !== 'undefined') lucide.createIcons();
         });
     </script>
 @endsection

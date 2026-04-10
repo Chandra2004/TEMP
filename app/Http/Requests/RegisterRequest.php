@@ -39,13 +39,11 @@ class RegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nama_lengkap' => 'required|string|max:255',
-            'no_telepon' => 'required|numeric|max:13',
-            'email' => 'required|email',
-            'tanggal_lahir' => 'required|date',
-            'password' => 'required|alpha_num|confirmed|min:6',
-            'password_confirm' => 'required|confirmed|same:password',
-            'checkbox' => 'required|accepted'
+            'username' => 'required|string|min:4|max:50|unique:users,username',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|min:6|confirmed',
+            'password_confirm' => 'required',
+            'terms' => 'required'
         ];
     }
 
@@ -58,13 +56,11 @@ class RegisterRequest extends FormRequest
     public function labels(): array
     {
         return [
-            'nama_lengkap' => 'nama lengkap',
-            'no_telepon' => 'nomor telepon',
+            'username' => 'username',
             'email' => 'alamat email',
-            'tanggal_lahir' => 'tanggal lahir',
             'password' => 'kata sandi',
             'password_confirm' => 'konfirmasi kata sandi',
-            'checkbox' => 'check box',
+            'terms' => 'syarat dan ketentuan',
         ];
     }
 

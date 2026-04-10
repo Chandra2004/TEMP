@@ -22,28 +22,40 @@ class DashboardController extends Controller
 
     public function __construct()
     {
+        $sessionUser = Helper::session_get("user");
+        
+        // Ambil data user lengkap dengan role dan profile
+        $user = User::query()
+            ->select(['users.*', 'roles.name as nama_role', 'data_users.*', 'users.id as id', 'users.uid as uid', 'users.email as email'])
+            ->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
+            ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
+            ->leftJoin('data_users', 'users.uid', '=', 'data_users.uid_user')
+            ->where('users.id', '=', $sessionUser['id'])
+            ->first();
+
+        if (!$user) {
+            Helper::redirect('/logout', 'error', 'Sesi Anda telah kedaluwarsa atau database telah diperbarui. Silakan login kembali.');
+        }
+
         $this->notification = Helper::get_flash('notification');
+        
+        // Pastikan nama_role tidak null sebelum di-ucfirst
+        $roleName = $sessionUser['nama_role'] ?? 'User';
+
         $this->dataTetap = [
             'notification' => $this->notification,
-            'title' => 'Dashboard ' . Helper::session_get("user")['nama_role'] . ' | Khafid Swimming Club (KSC) - Official Website',
-            'user' => Helper::session_get("user"),
-            'totalUnreadNotification' => Notification::query()->where('is_read', '=', 0)->where('uid_user', '=', Helper::session_get("user")['uid'])->count(),
-            'unReadNotification' => Notification::query()->where('is_read', '=', 0)->where('uid_user', '=', Helper::session_get("user")['uid'])->all(),
+            'title' => 'Dashboard ' . ucfirst($roleName) . ' | Khafid Swimming Club (KSC) - Official Website',
+            'user' => $user, 
+            'totalUnreadNotification' => Notification::query()->where('is_read', '=', 0)->where('uid_user', '=', $user->uid)->count(),
+            'unReadNotification' => Notification::query()->where('is_read', '=', 0)->where('uid_user', '=', $user->uid)->all(),
         ];
 
-        switch (Helper::session_get("user")['nama_role']) {
-            case 'admin':
-                $this->roleSpesificData = $this->getAdminData();
-                break;
-            case 'coach':
-                $this->roleSpesificData = $this->getCoachData();
-                break;
-            case 'member':
-                $this->roleSpesificData = $this->getMemberData();
-                break;
-            default:
-                ErrorController::error403();
-                break;
+        // DYNAMICS: Panggil method data berdasarkan role (Contoh: getAdminData)
+        $methodName = 'get' . ucfirst($roleName) . 'Data';
+        if (method_exists($this, $methodName)) {
+            $this->roleSpesificData = $this->$methodName();
+        } else {
+            $this->roleSpesificData = $this->getAtletData();
         }
 
         $this->data = array_merge($this->dataTetap, $this->roleSpesificData);
@@ -60,57 +72,85 @@ class DashboardController extends Controller
         return [
             'totalAnggota' => User::query()->count(),
             'eventAktif' => Event::query()->where('status_event', '=', 'berjalan')->count(),
-            'antreanValidasi' => Registration::query()->where('status', '=', 'menunggu')->count(),
+            'antreanValidasi' => Registration::query()->where('status_pendaftaran', '=', 'pending')->count(),
             'members' => User::query()
                 ->select([
-                    'id_user',
-                    'uid',
-                    'nama_lengkap',
-                    'tanggal_lahir',
-                    'nama_klub',
-                    'foto_profil'
+                    'users.id',
+                    'users.uid',
+                    'data_users.nama_lengkap',
+                    'data_users.tanggal_lahir',
+                    'data_users.klub_renang',
+                    'clubs.nama_klub',
+                    'data_users.foto_profil'
                 ])
-                ->where('uid_role', Role::where('nama_role', 'member')->first()->uid)
-                ->orderBy('created_at', 'DESC')
+                ->join('data_users', 'users.uid', '=', 'data_users.uid_user')
+                ->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
+                ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
+                ->leftJoin('clubs', 'data_users.uid_klub', '=', 'clubs.uid')
+                ->where('roles.name', '=', 'atlet')
+                ->orderBy('users.created_at', 'DESC')
                 ->limit(5)
                 ->all()
         ];
     }
 
-    protected function getCoachData()
+    protected function getSuperadminData()
     {
-        $memberRoleUid = Role::where('nama_role', 'member')->first()->uid;
+        return $this->getAdminData();
+    }
+
+    protected function getPelatihData()
+    {
         return [
-            'totalAnggota' => User::query()->where('uid_role', $memberRoleUid)->count(),
+            'totalAnggota' => User::query()
+                ->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
+                ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
+                ->where('roles.name', '=', 'atlet')
+                ->count(),
             'eventAktif' => Event::query()->where('status_event', '=', 'berjalan')->count(),
-            'antreanValidasi' => Registration::query()->where('status', '=', 'menunggu')->count(),
+            'antreanValidasi' => Registration::query()->where('status_pendaftaran', '=', 'pending')->count(),
             'upcomingEvents' => Event::query()
                 ->where('status_event', '=', 'berjalan')
-                ->where('tanggal_event', '>=', date('Y-m-d'))
-                ->orderBy('tanggal_event', 'ASC')
+                ->where('tanggal_mulai', '>=', date('Y-m-d'))
+                ->orderBy('tanggal_mulai', 'ASC')
                 ->limit(5)
                 ->all(),
             'registrasiTerbaru' => Registration::query()
-                ->select(['registrations.*', 'users.nama_lengkap', 'users.foto_profil', 'events.nama_event'])
+                ->select([
+                    'registrations.*', 
+                    'data_users.nama_lengkap', 
+                    'data_users.foto_profil', 
+                    'events.nama_event'
+                ])
                 ->join('users', 'users.uid', '=', 'registrations.uid_user')
-                ->join('events', 'events.uid', '=', 'registrations.uid_event')
+                ->join('data_users', 'users.uid', '=', 'data_users.uid_user')
+                ->join('event_categories', 'event_categories.uid', '=', 'registrations.uid_event_category')
+                ->join('events', 'events.uid', '=', 'event_categories.uid_event')
                 ->orderBy('registrations.created_at', 'DESC')
                 ->limit(5)
                 ->all()
         ];
     }
 
-    protected function getMemberData()
+    protected function getAtletData()
     {
         return [
-            'events' => Event::query()->where('status_event', '=', 'berjalan')->orderBy('tanggal_event', 'DESC')->limit(2)->all(),
+            'events' => Event::query()->where('status_event', '=', 'berjalan')->orderBy('tanggal_mulai', 'DESC')->limit(2)->all(),
             'members' => User::query()
-                ->where('uid_role', Role::where('nama_role', 'member')->first()->uid)
-                ->orderBy('created_at', 'DESC')
+                ->select(['users.uid', 'data_users.nama_lengkap', 'data_users.foto_profil', 'data_users.klub_renang'])
+                ->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
+                ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
+                ->leftJoin('data_users', 'users.uid', '=', 'data_users.uid_user')
+                ->where('roles.name', '=', 'atlet')
+                ->orderBy('users.created_at', 'DESC')
                 ->all(),
             'coaches' => User::query()
-                ->where('uid_role', Role::where('nama_role', 'coach')->first()->uid)
-                ->orderBy('created_at', 'DESC')
+                ->select(['users.uid', 'data_users.nama_lengkap', 'data_users.foto_profil', 'data_users.klub_renang'])
+                ->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
+                ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
+                ->leftJoin('data_users', 'users.uid', '=', 'data_users.uid_user')
+                ->where('roles.name', '=', 'pelatih')
+                ->orderBy('users.created_at', 'DESC')
                 ->all()
 
         ];
@@ -121,20 +161,32 @@ class DashboardController extends Controller
         $eventUid = Helper::request()->get('event_uid');
 
         $query = Registration::query()
-            ->select(['registrations.*', 'users.nama_lengkap', 'events.nama_event'])
+            ->select([
+                'registrations.*', 
+                'data_users.nama_lengkap', 
+                'events.nama_event'
+            ])
             ->join('users', 'users.uid', '=', 'registrations.uid_user')
-            ->join('events', 'events.uid', '=', 'registrations.uid_event');
+            ->join('data_users', 'users.uid', '=', 'data_users.uid_user')
+            ->join('event_categories', 'event_categories.uid', '=', 'registrations.uid_event_category')
+            ->join('events', 'events.uid', '=', 'event_categories.uid_event');
 
         if ($eventUid && $eventUid !== 'all') {
-            $query->where('registrations.uid_event', '=', $eventUid);
+            $query->where('events.uid', '=', $eventUid);
         }
 
-        $previewData = $query->orderBy('registrations.tanggal_registrasi', 'DESC')->limit(10)->all();
+        $previewData = $query->orderBy('registrations.entry_time', 'DESC')->limit(10)->all();
 
         return View::render('dashboard.general.report', array_merge($this->data, [
             'title' => 'Laporan & Ekspor Data ' . Helper::session_get("user")['nama_role'] . ' | Khafid Swimming Club (KSC) - Official Website',
             'categories' => Category::query()->all(),
-            'events' => Event::query()->orderBy('tanggal_event', 'DESC')->all(),
+            'events' => Event::query()->orderBy('tanggal_mulai', 'DESC')->all(),
+            'eventSelesai' => Event::query()->where('status_event', '=', 'selesai')->count(),
+            'totalAnggota' => User::query()
+                ->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
+                ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
+                ->where('roles.name', '=', 'atlet')
+                ->count(),
             'previewData' => $previewData,
             'filters' => [
                 'event_uid' => $eventUid,
@@ -150,15 +202,27 @@ class DashboardController extends Controller
 
         if ($type === 'pendaftaran') {
             $query = Registration::query()
-                ->select(['registrations.*', 'users.nama_lengkap', 'users.tanggal_lahir', 'users.jenis_kelamin', 'users.nama_klub', 'events.nama_event', 'events.tanggal_event', 'events.lokasi_event', 'events.biaya_event'])
+                ->select([
+                    'registrations.*', 
+                    'data_users.nama_lengkap', 
+                    'data_users.tanggal_lahir', 
+                    'data_users.jenis_kelamin', 
+                    'data_users.klub_renang', 
+                    'events.nama_event', 
+                    'events.tanggal_mulai', 
+                    'events.lokasi_event', 
+                    'events.biaya_event'
+                ])
                 ->join('users', 'users.uid', '=', 'registrations.uid_user')
-                ->join('events', 'events.uid', '=', 'registrations.uid_event');
+                ->join('data_users', 'users.uid', '=', 'data_users.uid_user')
+                ->join('event_categories', 'event_categories.uid', '=', 'registrations.uid_event_category')
+                ->join('events', 'events.uid', '=', 'event_categories.uid_event');
 
             if ($eventUid && $eventUid !== 'all') {
-                $query->where('registrations.uid_event', '=', $eventUid);
+                $query->where('events.uid', '=', $eventUid);
             }
 
-            $results = $query->orderBy('registrations.tanggal_registrasi', 'ASC')->all();
+            $results = $query->orderBy('registrations.created_at', 'ASC')->all();
 
             if ($format === 'pdf') {
                 return $this->exportToPdf($results, $eventUid);
@@ -177,18 +241,11 @@ class DashboardController extends Controller
             $event = Event::where('uid', $eventUid)->first();
         }
 
-        return View::render('dashboard.general.reports.pdf-pendaftaran', [
-            'user' => Helper::session_get('user'),
-            'registrations' => $data,
-            'event' => $event,
-            'title' => 'Laporan Pendaftaran Event ' . ($event == null ? '' : $event['nama_event'])
-        ]);
-        
         $html = View::renderToString('dashboard.general.reports.pdf-pendaftaran', [
             'user' => Helper::session_get('user'),
             'registrations' => $data,
             'event' => $event,
-            'title' => 'Laporan Pendaftaran Event'
+            'title' => 'Laporan Pendaftaran Event ' . ($event == null ? '' : $event['nama_event'])
         ]);
 
         $dompdf = new \Dompdf\Dompdf();
@@ -221,8 +278,8 @@ class DashboardController extends Controller
                 $row['jenis_kelamin'] === 'L' ? 'Laki-laki' : 'Perempuan',
                 $row['nama_klub'] ?? '-',
                 $row['nama_event'],
-                ucfirst($row['status']),
-                $row['tanggal_registrasi']
+                ucfirst($row['status_pendaftaran']),
+                $row['created_at']
             ]);
         }
 

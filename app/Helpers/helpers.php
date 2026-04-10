@@ -216,3 +216,24 @@ if (!function_exists('dd')) {
     }
     
 }
+
+if (!function_exists('auth')) {
+    /**
+     * Get the authenticated user instance.
+     */
+    function auth()
+    {
+        return \TheFramework\Models\User::auth();
+    }
+}
+
+if (!function_exists('can')) {
+    /**
+     * Check if the authenticated user has a specific permission.
+     */
+    function can($permission)
+    {
+        $user = auth();
+        return $user ? $user->can($permission) : false;
+    }
+}

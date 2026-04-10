@@ -18,13 +18,20 @@ use TheFramework\App\Model;
 class Role extends Model
 {
     protected $table = 'roles';
-    protected $primaryKey = 'id_role';
+    protected $primaryKey = 'id';
 
     protected $fillable = [
         'uid',
-        'nama_role'
+        'name',
+        'guard_name',
+        'team_id'
     ];
 
     protected $hidden = [
     ];
+
+    public function permissions()
+    {
+        return $this->belongsToMany(Permission::class, 'role_has_permissions', 'role_id', 'permission_id');
+    }
 }

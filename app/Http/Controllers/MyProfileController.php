@@ -32,6 +32,7 @@ class MyProfileController extends DashboardController
             $oldData = $this->user->where('uid', $uidUser)->first();
             $dataPhoto = null;
             $dataKtp = null;
+            $dataAkta = null;
 
             if ($request->hasFile('foto_profil')) {
                 if ($oldData['foto_profil'] != null) {
@@ -56,11 +57,24 @@ class MyProfileController extends DashboardController
             } else {
                 $dataKtp = $oldData['foto_ktp'];
             }
+
+            if ($request->hasFile('foto_akta')) {
+                if ($oldData['foto_akta'] != null) {
+                    UploadHandler::delete($oldData['foto_akta'], '/birth_certificates');
+                }    
+                $dataAkta = UploadHandler::handleUploadToWebP($request->file('foto_akta'), '/birth_certificates', 'akta_');
+                if(UploadHandler::isError($dataAkta)) {
+                    throw new Exception(UploadHandler::getErrorMessage($dataAkta));
+                }
+            } else {
+                $dataAkta = $oldData['foto_akta'];
+            }
             
             $data = $request->validated();
             $data['uid'] = $uidUser;
             $data['foto_profil'] = $dataPhoto;
             $data['foto_ktp'] = $dataKtp;
+            $data['foto_akta'] = $dataAkta;
 
             if (!empty($data['password'])) {
                 $data['password'] = Helper::hash_password($data['password']);
@@ -72,10 +86,14 @@ class MyProfileController extends DashboardController
                 ErrorController::error403();
             }
 
-            $checkTelp = user::query()->where('no_telepon', '=', $data['no_telepon'])
-            ->where('uid', '!=', $uidUser)->first();
+            $checkTelp = User::query()
+                ->join('data_users', 'users.uid', '=', 'data_users.uid_user')
+                ->where('data_users.no_telepon', '=', $data['no_telepon'])
+                ->where('users.uid', '!=', $uidUser)
+                ->first();
+
             if ($checkTelp) {
-                return Helper::redirect("/{$role}/dashboard/my-profile", 'error', 'nomor telepon sudah digunakan orang lain', 10);
+                return Helper::redirect("/{$role}/dashboard/my-profile", 'error', 'Nomor telepon sudah digunakan oleh pengguna lain.', 10);
             } else {
                 $status = $this->user->updateMyProfile($data) ? true : false;
                 if ($status === false) {

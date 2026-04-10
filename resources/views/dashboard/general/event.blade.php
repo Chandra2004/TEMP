@@ -15,102 +15,80 @@
             </button>
         </div>
 
-        <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+        <div class="bg-white rounded-3xl border border-slate-100 shadow-xl shadow-slate-200/50 overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead class="bg-slate-50 border-b border-slate-200">
-                        <tr>
-                            <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Banner</th>
-                            <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-center">
-                                Event</th>
-                            <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Kategori</th>
-                            <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Author</th>
-                            <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Waktu & Tanggal
-                            </th>
-                            <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-center">
-                                Biaya</th>
-                            <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Lokasi</th>
-                            <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-center">
-                                Status</th>
-                            <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-center">Aksi
-                            </th>
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="bg-slate-50/50 border-b border-slate-100">
+                            <th scope="col" class="px-6 py-4 font-black text-[10px] text-slate-400 uppercase tracking-widest">Event</th>
+                            <th scope="col" class="px-6 py-4 font-black text-[10px] text-slate-400 uppercase tracking-widest">Dates</th>
+                            <th scope="col" class="px-6 py-4 font-black text-[10px] text-slate-400 uppercase tracking-widest text-center">Lanes</th>
+                            <th scope="col" class="px-6 py-4 font-black text-[10px] text-slate-400 uppercase tracking-widest text-center">Status</th>
+                            <th scope="col" class="px-6 py-4 font-black text-[10px] text-slate-400 uppercase tracking-widest text-center">Actions</th>
                         </tr>
                     </thead>
-
-                    <tbody class="divide-y divide-slate-100" id="event-table-body">
+                    <tbody class="divide-y divide-slate-50">
                         @foreach ($events['data'] as $event)
-                            <tr class="hover:bg-slate-50 transition">
-                                <td class="px-6 py-4">
-                                    @if ($event->banner_event === null)
-                                        <img src="https://lh5.googleusercontent.com/proxy/t08n2HuxPfw8OpbutGWjekHAgxfPFv-pZZ5_-uTfhEGK8B5Lp-VN4VjrdxKtr8acgJA93S14m9NdELzjafFfy13b68pQ7zzDiAmn4Xg8LvsTw1jogn_7wStYeOx7ojx5h63Gliw"
-                                            alt="Banner Event" class="w-16 h-10 object-cover rounded">
-                                    @else
-                                        <img src="{{ url('/file/banner-event/' . $event['banner_event']) }}"
-                                            alt="Banner Event" class="w-16 h-10 object-cover rounded">
-                                    @endif
-                                </td>
-                                <td class="px-6 py-4">
-                                    <p class="text-sm font-bold text-slate-900">{{ $event['nama_event'] }}</p>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <p class="text-sm text-slate-700">{{ $event['nama_kategori'] }}</p>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <p class="text-sm text-slate-700">{{ $event['author'] }}</p>
-                                </td>
-                                <td class="px-6 py-4 text-center">
-                                    <p class="text-sm text-slate-900">
-                                        {{ \Carbon\Carbon::parse($event['tanggal_event'])->translatedFormat('d M Y') }}</p>
-                                    <p class="text-xs text-slate-500">
-                                        {{ \Carbon\Carbon::parse($event['waktu_event'])->translatedFormat('H:i:s') }}</p>
-                                </td>
-                                <td class="px-6 py-4 text-center align-middle">
-                                    <div class="flex flex-col items-center justify-center">
-
-                                        @if ($event['tipe_event'] === 'gratis')
-                                            <span class="text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded">
-                                                {{ $event['tipe_event'] }}
-                                            </span>
-                                        @else
-                                            <span class="text-xs font-bold text-red-600 bg-red-50 px-2 py-1 rounded">
-                                                {{ $event['tipe_event'] }}
-                                            </span>
-                                        @endif
-
-                                        <p class="text-xs mt-1 font-bold text-slate-700">
-                                            {{ $event['biaya_event'] }}
-                                        </p>
+                            <tr class="hover:bg-slate-50/50 transition-colors group">
+                                <td class="px-6 py-5">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-14 h-10 rounded-xl overflow-hidden shadow-sm flex-shrink-0">
+                                            <img src="{{ $event['banner_event'] == null ? url('/file/dummy/dummy.webp') : url('/file/banner-event/' . $event['banner_event']) }}"
+                                                alt="Banner" class="w-full h-full object-cover">
+                                        </div>
+                                        <div>
+                                            <p class="font-bold text-slate-900 group-hover:text-blue-600 transition truncate max-w-[200px]">
+                                                {{ $event['nama_event'] }}</p>
+                                            <p class="text-[10px] font-medium text-slate-400 uppercase tracking-wider mt-0.5">
+                                                {{ $event['lokasi_event'] }}</p>
+                                        </div>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4">
-                                    <p class="text-sm text-slate-700">{{ $event['lokasi_event'] }}</p>
+                                <td class="px-6 py-5">
+                                    <div class="flex flex-col">
+                                        <span class="text-xs font-bold text-slate-700">
+                                            {{ date('d M Y', strtotime($event['tanggal_mulai'])) }}
+                                        </span>
+                                        <span class="text-[10px] font-medium text-slate-400">
+                                            s/d {{ date('d M Y', strtotime($event['tanggal_selesai'])) }}
+                                        </span>
+                                    </div>
                                 </td>
-                                @php
-                                    $statusClass = match ($event['status_event']) {
-                                        'berjalan' => 'bg-green-100 text-green-700 border-green-200',
-                                        'ditunda' => 'bg-yellow-100 text-yellow-700 border-yellow-200',
-                                        'ditutup' => 'bg-red-100 text-red-700 border-red-200',
-                                        default => 'bg-gray-100 text-gray-700 border-gray-200',
-                                    };
-                                @endphp
-
-                                <td class="px-6 py-4 text-center align-middle">
-                                    <span
-                                        class="px-3 py-1 text-[10px] font-bold lowercase rounded-full border {{ $statusClass }}">
-                                        {{ strtolower($event['status_event']) }}
-                                    </span>
+                                <td class="px-6 py-5 text-center">
+                                    <span class="text-sm font-black text-slate-900">{{ $event['jumlah_lintasan'] }}</span>
                                 </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex justify-center gap-3">
+                                <td class="px-6 py-5">
+                                    <div class="flex justify-center">
+                                        @php
+                                            $statusConfig = match ($event['status_event']) {
+                                                'berjalan' => ['bg' => 'bg-green-50', 'text' => 'text-green-600', 'border' => 'border-green-100'],
+                                                'ditunda' => ['bg' => 'bg-amber-50', 'text' => 'text-amber-600', 'border' => 'border-amber-100'],
+                                                'ditutup' => ['bg' => 'bg-rose-50', 'text' => 'text-rose-600', 'border' => 'border-rose-100'],
+                                                default => ['bg' => 'bg-slate-50', 'text' => 'text-slate-600', 'border' => 'border-slate-100'],
+                                            };
+                                        @endphp
+                                        <span class="px-2.5 py-1 {{ $statusConfig['bg'] }} {{ $statusConfig['text'] }} {{ $statusConfig['border'] }} border rounded-lg text-[9px] font-black uppercase tracking-widest">
+                                            {{ $event['status_event'] }}
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-5">
+                                    <div class="flex items-center justify-center gap-2">
+                                        <a href="{{ url('/' . $user['nama_role'] . '/dashboard/management-event/' . $event['uid'] . '/export-buku-acara') }}"
+                                            target="_blank"
+                                            class="p-2 bg-emerald-50 text-emerald-600 rounded-xl hover:bg-emerald-600 hover:text-white transition shadow-sm active:scale-90"
+                                            title="Export Buku Acara">
+                                            <i data-lucide="printer" class="w-4 h-4"></i>
+                                        </a>
                                         <button data-modal-target="modal-edit-event-{{ $event['uid'] }}"
                                             data-modal-toggle="modal-edit-event-{{ $event['uid'] }}"
-                                            class="text-blue-600 hover:text-blue-800 transition p-1 hover:bg-blue-50 rounded">
-                                            <i data-lucide="edit" class="w-5 h-5"></i>
+                                            class="p-2 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-600 hover:text-white transition shadow-sm active:scale-90">
+                                            <i data-lucide="edit-3" class="w-4 h-4"></i>
                                         </button>
                                         <button data-modal-target="modal-hapus-event-{{ $event['uid'] }}"
                                             data-modal-toggle="modal-hapus-event-{{ $event['uid'] }}"
-                                            class="text-red-600 hover:text-red-800 transition p-1 hover:bg-red-50 rounded">
-                                            <i data-lucide="trash-2" class="w-5 h-5"></i>
+                                            class="p-2 bg-rose-50 text-rose-600 rounded-xl hover:bg-rose-600 hover:text-white transition shadow-sm active:scale-90">
+                                            <i data-lucide="trash-2" class="w-4 h-4"></i>
                                         </button>
                                     </div>
                                 </td>
@@ -167,7 +145,7 @@
     </div>
 
     <div id="modal-tambah-event" tabindex="-1" aria-hidden="true"
-        class="hidden fixed top-0 left-0 right-0 z-[70] w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-full max-h-full flex items-center justify-center bg-slate-900/60 backdrop-blur-sm transition-opacity">
+        class="hidden fixed top-0 left-0 right-0 z-[70] w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-full max-h-full items-center justify-center bg-slate-900/60 backdrop-blur-sm transition-opacity">
         <div class="relative w-full max-w-4xl max-h-full">
             <div class="relative bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
                 <div class="flex items-center justify-between p-4 md:p-6 border-b border-slate-100 bg-slate-50/50">
@@ -186,7 +164,49 @@
                 </div>
                 <form class="p-6 md:p-8 overflow-y-auto max-h-[75vh]"
                     action="{{ url('/' . $user['nama_role'] . '/' . $user['uid'] . '/dashboard/management-event/create/process') }}"
-                    method="POST" enctype="multipart/form-data">
+                    method="POST" enctype="multipart/form-data" x-data="{
+                        tipe: 'berbayar',
+                        categories: {{ json_encode($categories) }},
+                        matches: [{
+                            uid_category: '',
+                            nama_acara: '',
+                            tipe_biaya: 'berbayar',
+                            biaya_pendaftaran: 0,
+                            jumlah_seri: 1,
+                            waktu_mulai: '08:00',
+                            requirements: []
+                        }],
+                        addMatch() {
+                            this.matches.push({
+                                uid_category: '',
+                                nama_acara: '',
+                                tipe_biaya: 'berbayar',
+                                biaya_pendaftaran: 0,
+                                jumlah_seri: 1,
+                                waktu_mulai: '08:00',
+                                requirements: []
+                            });
+                        },
+                        updateMatchName(index) {
+                            const cat = this.categories.find(c => c.uid === this.matches[index].uid_category);
+                            if (cat) {
+                                this.matches[index].nama_acara = cat.nama_kategori;
+                            }
+                        },
+                        removeMatch(index) {
+                            this.matches.splice(index, 1);
+                        },
+                        addRequirement(matchIndex) {
+                            this.matches[matchIndex].requirements.push({
+                                parameter_name: '',
+                                operator: '=',
+                                parameter_value: ''
+                            });
+                        },
+                        removeRequirement(matchIndex, reqIndex) {
+                            this.matches[matchIndex].requirements.splice(reqIndex, 1);
+                        }
+                    }">
                     @csrf
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
                         <div class="md:col-span-2">
@@ -221,29 +241,15 @@
                             <label class="block mb-2 text-sm font-bold text-slate-700 uppercase tracking-wider">Nama
                                 Event</label>
                             <input type="text" name="nama_event" value="{{ old('nama_event') }}"
-                                class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-ksc-blue focus:border-ksc-blue block w-full p-3.5 outline-none"
+                                class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-ksc-blue focus:border-ksc-blue block w-full p-3.5 outline-none font-bold"
                                 placeholder="Contoh: KSC Fun Swimming 2026" required>
-                        </div>
-
-                        <div>
-                            <label class="block mb-2 text-sm font-bold text-slate-700 uppercase tracking-wider">Kategori
-                                Lomba</label>
-                            <select name="uid_kategori"
-                                class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-ksc-blue block w-full p-3.5 outline-none">
-                                <option value="" disabled selected>-- Pilih Kategori --</option>
-                                @foreach ($categories as $category)
-                                    <option value="{{ $category['uid'] }}"
-                                        {{ old('uid_kategori') === $category['uid'] ? 'selected' : '' }}>
-                                        {{ $category['nama_kategori'] }}</option>
-                                @endforeach
-                            </select>
                         </div>
 
                         <div>
                             <label
                                 class="block mb-2 text-sm font-bold text-slate-700 uppercase tracking-wider">Penyelenggara</label>
                             <select name="uid_author"
-                                class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-ksc-blue block w-full p-3.5 outline-none">
+                                class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-ksc-blue block w-full p-3.5 outline-none font-bold">
                                 @foreach ($authors as $author)
                                     <option value="{{ $author['uid'] }}"
                                         {{ $user['uid'] === $author['uid'] ? 'selected' : '' }}>
@@ -252,123 +258,255 @@
                             </select>
                         </div>
 
-                        <div class="md:col-span-2">
-                            <label class="block mb-2 text-sm font-bold text-slate-700 uppercase tracking-wider">Lokasi
-                                Pertandingan</label>
+                        <div>
+                            <label class="block mb-2 text-sm font-bold text-slate-700 uppercase tracking-wider">Lokasi Pertandingan</label>
                             <input type="text" name="lokasi_event" value="{{ old('lokasi_event') }}"
-                                class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-ksc-blue block w-full p-3.5 outline-none"
+                                class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-ksc-blue block w-full p-3.5 outline-none font-bold"
                                 placeholder="Nama Kolam / Alamat Lengkap" required>
                         </div>
 
                         <div>
-                            <label class="block mb-2 text-sm font-bold text-slate-700 uppercase tracking-wider">Tanggal
-                                Pelaksanaan</label>
-                            <input type="date" name="tanggal_event" value="{{ old('tanggal_event') }}"
-                                class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-xl block w-full p-3.5 outline-none focus:ring-2 focus:ring-blue-500"
+                            <label class="block mb-2 text-sm font-bold text-slate-700 uppercase tracking-wider">Tanggal Mulai</label>
+                            <input type="date" name="tanggal_mulai" value="{{ old('tanggal_mulai') }}"
+                                class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-ksc-blue block w-full p-3.5 outline-none font-bold"
                                 required>
                         </div>
 
                         <div>
-                            <label class="block mb-2 text-sm font-bold text-slate-700 uppercase tracking-wider">Waktu Mulai
-                                (WIB)</label>
-                            <input type="time" name="waktu_event" value="{{ old('waktu_event') }}"
-                                class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-xl block w-full p-3.5 outline-none focus:ring-2 focus:ring-blue-500"
+                            <label class="block mb-2 text-sm font-bold text-slate-700 uppercase tracking-wider">Tanggal Selesai</label>
+                            <input type="date" name="tanggal_selesai" value="{{ old('tanggal_selesai') }}"
+                                class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-ksc-blue block w-full p-3.5 outline-none font-bold"
                                 required>
                         </div>
 
                         <div>
-                            <label class="block mb-2 text-sm font-bold text-slate-700 uppercase tracking-wider">Kuota
-                                Peserta</label>
-                            <input type="number" name="kuota_peserta" value="{{ old('kuota_peserta') }}"
-                                min="1"
-                                class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-xl block w-full p-3.5 outline-none focus:ring-2 focus:ring-blue-500"
+                            <label class="block mb-2 text-sm font-bold text-slate-700 uppercase tracking-wider">Waktu Mulai (WIB)</label>
+                            <input type="time" name="waktu_mulai" value="{{ old('waktu_mulai', '08:00') }}"
+                                class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-ksc-blue block w-full p-3.5 outline-none font-bold"
                                 required>
                         </div>
 
-                        <div x-data="{ tipe: 'berbayar' }">
-                            <label class="block mb-2 text-sm font-bold text-slate-700 uppercase tracking-wider">Tipe
-                                Event</label>
-                            <div class="grid grid-cols-2 gap-3">
-                                <label
-                                    class="flex items-center justify-center p-3.5 bg-slate-50 border border-slate-300 rounded-xl cursor-pointer hover:bg-slate-100 transition"
-                                    :class="tipe === 'gratis' ? 'ring-2 ring-ksc-blue bg-blue-50 border-blue-200' : ''">
-                                    <input type="radio" name="tipe_event" value="gratis" class="hidden"
-                                        x-model="tipe">
-                                    <span class="text-xs font-bold uppercase tracking-widest"
-                                        :class="tipe === 'gratis' ? 'text-ksc-blue' : 'text-slate-500'">Gratis</span>
-                                </label>
-                                <label
-                                    class="flex items-center justify-center p-3.5 bg-slate-50 border border-slate-300 rounded-xl cursor-pointer hover:bg-slate-100 transition"
-                                    :class="tipe === 'berbayar' ? 'ring-2 ring-ksc-blue bg-blue-50 border-blue-200' : ''">
-                                    <input type="radio" name="tipe_event" value="berbayar" class="hidden"
-                                        x-model="tipe">
-                                    <span class="text-xs font-bold uppercase tracking-widest"
-                                        :class="tipe === 'berbayar' ? 'text-ksc-blue' : 'text-slate-500'">Berbayar</span>
-                                </label>
-                            </div>
-                            <div x-show="tipe === 'berbayar'" x-transition class="mt-4">
-                                <label
-                                    class="block mb-2 text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Nominal
-                                    Biaya (IDR)</label>
-                                <div class="relative mb-4">
-                                    <div class="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-slate-400 text-sm">
-                                        Rp</div>
-                                    <input type="number" name="biaya_event" value="{{ old('biaya_event') }}"
-                                        class="bg-white border border-blue-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-ksc-blue block w-full p-3.5 pl-12 outline-none shadow-sm"
-                                        placeholder="Contoh: 150000" :required="tipe === 'berbayar'">
-                                </div>
-                                <label
-                                    class="block mb-2 text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Metode
-                                    Pembayaran</label>
-                                <select name="uid_payment_method"
-                                    class="bg-white border border-blue-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-ksc-blue block w-full p-3.5 outline-none shadow-sm"
-                                    :required="tipe === 'berbayar'">
-                                    <option value="" disabled selected>-- Pilih Rekening Pembayaran --</option>
-                                    @foreach ($paymentMethods as $pm)
-                                        <option value="{{ $pm['uid'] }}">{{ $pm['bank'] }} - {{ $pm['rekening'] }}
-                                            (a.n {{ $pm['atas_nama'] }})
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
+                        <div>
+                            <label class="block mb-2 text-sm font-bold text-slate-700 uppercase tracking-wider">Jumlah Lintasan</label>
+                            <input type="number" name="jumlah_lintasan" value="{{ old('jumlah_lintasan', 8) }}"
+                                class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-ksc-blue block w-full p-3.5 outline-none font-bold"
+                                required min="1">
                         </div>
 
                         <div class="md:col-span-2">
-                            <label class="block mb-2 text-sm font-bold text-slate-700 uppercase tracking-wider">Status
-                                Publikasi</label>
+                            <label class="block mb-2 text-sm font-bold text-slate-700 uppercase tracking-wider">Status Publikasi</label>
                             <select name="status_event"
-                                class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-ksc-blue block w-full p-3.5 outline-none">
+                                class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-ksc-blue block w-full p-3.5 outline-none font-bold">
                                 <option value="berjalan">Berjalan (Registration Open)</option>
                                 <option value="ditunda">Ditunda (Postponed)</option>
                                 <option value="ditutup">Ditutup (Registration Closed)</option>
                             </select>
                         </div>
 
-                        <div class="md:col-span-2">
-                            <label class="block mb-2 text-sm font-bold text-slate-700 uppercase tracking-wider">Deskripsi &
-                                Peraturan</label>
-                            <div
-                                class="bg-slate-50 border border-slate-300 rounded-2xl overflow-hidden shadow-inner font-sans">
-                                <div id="editor-create-container" class="h-56 bg-white text-left"></div>
-                                <input type="hidden" name="deskripsi" id="deskripsi-input">
-                            </div>
+                    <div class="md:col-span-2 space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                            <label
+                                class="text-sm font-black text-slate-900 uppercase tracking-widest flex items-center gap-2">
+                                <i data-lucide="list-checks" class="w-5 h-5 text-ksc-blue"></i>
+                                Daftar Lomba & Biaya
+                            </label>
+                            <button type="button" @click="addMatch()"
+                                class="text-[10px] font-bold bg-blue-50 text-ksc-blue px-3 py-1.5 rounded-lg hover:bg-ksc-blue hover:text-white transition flex items-center gap-1 uppercase tracking-tighter">
+                                <i data-lucide="plus" class="w-3 h-3"></i> Tambah Lomba
+                            </button>
+                        </div>
+
+                        <div class="space-y-6">
+                            <template x-for="(match, index) in matches" :key="index">
+                                <div
+                                    class="bg-slate-50/50 border border-slate-200 p-6 rounded-2xl relative group shadow-sm hover:shadow-md transition-all">
+                                    <button type="button" @click="removeMatch(index)" x-show="matches.length > 1"
+                                        class="absolute -top-2 -right-2 bg-red-100 text-red-600 p-2 rounded-full shadow-lg hover:bg-red-600 hover:text-white transition z-10 border-2 border-white">
+                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                    </button>
+
+                                    <div class="grid grid-cols-1 md:grid-cols-12 gap-5 text-left">
+                                        <div class="md:col-span-4">
+                                            <label
+                                                class="block mb-1 text-[10px] font-black text-slate-400 uppercase tracking-widest">Pilih
+                                                Gaya / Lomba</label>
+                                            <select :name="'matches[' + index + '][uid_category]'"
+                                                x-model="match.uid_category" @change="updateMatchName(index)"
+                                                class="bg-white border border-slate-200 text-slate-900 text-sm font-bold rounded-xl focus:ring-2 focus:ring-blue-100 block w-full p-3 outline-none"
+                                                required>
+                                                <option value="" disabled>-- Pilih Gaya --</option>
+                                                <template x-for="cat in categories" :key="cat.uid">
+                                                    <option :value="cat.uid" x-text="cat.nama_kategori"></option>
+                                                </template>
+                                            </select>
+                                            <input type="hidden" :name="'matches[' + index + '][nama_acara]'"
+                                                :value="match.nama_acara">
+                                        </div>
+                                        <div class="md:col-span-2">
+                                            <label
+                                                class="block mb-1 text-[10px] font-black text-slate-400 uppercase tracking-widest">Waktu</label>
+                                            <input type="time" :name="'matches[' + index + '][waktu_mulai]'"
+                                                x-model="match.waktu_mulai"
+                                                class="bg-white border border-slate-200 text-slate-900 text-sm font-bold rounded-xl focus:ring-2 focus:ring-blue-100 block w-full p-3 outline-none"
+                                                required>
+                                        </div>
+                                        <div class="md:col-span-2">
+                                            <label
+                                                class="block mb-1 text-[10px] font-black text-slate-400 uppercase tracking-widest">Tipe</label>
+                                            <select :name="'matches[' + index + '][tipe_biaya]'" x-model="match.tipe_biaya"
+                                                class="bg-white border border-slate-200 text-slate-900 text-sm font-bold rounded-xl focus:ring-2 focus:ring-blue-100 block w-full p-3 outline-none">
+                                                <option value="berbayar">Berbayar</option>
+                                                <option value="gratis">Gratis</option>
+                                            </select>
+                                        </div>
+                                        <div class="md:col-span-2">
+                                            <label
+                                                class="block mb-1 text-[10px] font-black text-slate-400 uppercase tracking-widest">Biaya</label>
+                                            <input type="number" :name="'matches[' + index + '][biaya_pendaftaran]'"
+                                                x-model="match.biaya_pendaftaran"
+                                                class="bg-white border border-slate-200 text-slate-900 text-sm font-bold rounded-xl focus:ring-2 focus:ring-blue-100 block w-full p-3 outline-none"
+                                                :disabled="match.tipe_biaya === 'gratis'"
+                                                :class="match.tipe_biaya === 'gratis' ? 'opacity-50 bg-slate-100' : ''"
+                                                required>
+                                        </div>
+                                        <div class="md:col-span-2">
+                                            <label
+                                                class="block mb-1 text-[10px] font-black text-slate-400 uppercase tracking-widest">Jumlah Seri</label>
+                                            <input type="number" :name="'matches[' + index + '][jumlah_seri]'"
+                                                x-model="match.jumlah_seri"
+                                                class="bg-white border border-slate-200 text-slate-900 text-sm font-bold rounded-xl focus:ring-2 focus:ring-blue-100 block w-full p-3 outline-none"
+                                                placeholder="1" required min="1">
+                                        </div>
+
+                                        <!-- Layout perbaikan Syarat Partisipasi -->
+                                        <div class="md:col-span-12 mt-4">
+                                            <div class="p-5 bg-white border border-slate-100 rounded-xl shadow-inner">
+                                                <div class="flex items-center justify-between mb-4">
+                                                    <h4
+                                                        class="text-xs font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                                                        <i data-lucide="shield-check" class="w-4 h-4 text-blue-500"></i>
+                                                        Persyaratan Khusus
+                                                        <span
+                                                            class="text-[9px] font-medium text-slate-400 lowercase tracking-normal">(Opsional)</span>
+                                                    </h4>
+                                                    <button type="button" @click="addRequirement(index)"
+                                                        class="text-[10px] bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-black transition font-bold flex items-center gap-2 shadow-md">
+                                                        <i data-lucide="plus" class="w-3.5 h-3.5"></i> Tambah Syarat
+                                                    </button>
+                                                </div>
+
+                                                <div class="space-y-3">
+                                                    <template x-for="(req, reqIndex) in match.requirements"
+                                                        :key="reqIndex">
+                                                        <div
+                                                            class="grid grid-cols-1 md:grid-cols-12 gap-3 items-center bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                                            <div class="md:col-span-4">
+                                                                <label
+                                                                    class="block mb-1 text-[9px] font-black text-slate-400 uppercase">Parameter</label>
+                                                                <select
+                                                                    :name="'matches[' + index + '][requirements][' + reqIndex +
+                                                                        '][parameter_name]'"
+                                                                    x-model="req.parameter_name"
+                                                                    class="w-full text-xs font-bold px-3 py-2 bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-100 outline-none transition">
+                                                                    <option value="">Pilih Parameter</option>
+                                                                    <option value="gender">Jenis Kelamin</option>
+                                                                    <option value="birth_year">Tahun Lahir</option>
+                                                                    <option value="age_min">Umur Minimal</option>
+                                                                    <option value="age_max">Umur Maksimal</option>
+                                                                    <option value="club_only">Khusus Klub</option>
+                                                                </select>
+                                                            </div>
+                                                            <div class="md:col-span-2">
+                                                                <label
+                                                                    class="block mb-1 text-[9px] font-black text-slate-400 uppercase">Operator</label>
+                                                                <select
+                                                                    :name="'matches[' + index + '][requirements][' + reqIndex +
+                                                                        '][operator]'"
+                                                                    x-model="req.operator"
+                                                                    class="w-full text-xs font-bold px-3 py-2 bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-100 outline-none transition">
+                                                                    <option value="="> = </option>
+                                                                    <option value=">"> > </option>
+                                                                    <option value="<"> < </option>
+                                                                    <option value=">="> >= </option>
+                                                                    <option value="<="> <= </option>
+                                                                    <option value="IN"> DI DALAM </option>
+                                                                </select>
+                                                            </div>
+                                                            <div class="md:col-span-5">
+                                                                <label
+                                                                    class="block mb-1 text-[9px] font-black text-slate-400 uppercase">Nilai
+                                                                    Syarat</label>
+                                                                <input type="text"
+                                                                    :name="'matches[' + index + '][requirements][' + reqIndex +
+                                                                        '][parameter_value]'"
+                                                                    x-model="req.parameter_value"
+                                                                    placeholder="Contoh: Putra / 2017 / KSC"
+                                                                    class="w-full text-xs font-bold px-3 py-2 bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-100 outline-none transition">
+                                                            </div>
+                                                            <div class="md:col-span-1 flex justify-center pt-4 md:pt-0">
+                                                                <button type="button"
+                                                                    @click="removeRequirement(index, reqIndex)"
+                                                                    class="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition">
+                                                                    <i data-lucide="x" class="w-4 h-4"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </template>
+                                                    <div x-show="match.requirements.length === 0"
+                                                        class="text-center py-6 border-2 border-dashed border-slate-100 rounded-xl bg-slate-50/30">
+                                                        <p
+                                                            class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+                                                            Tanpa Syarat Khusus</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
                         </div>
                     </div>
-                    <div class="flex items-center pt-8 mt-6 border-t border-slate-100 space-x-3 justify-end">
-                        <button data-modal-hide="modal-tambah-event" type="button"
-                            class="text-slate-500 bg-white hover:bg-slate-50 rounded-xl border border-slate-200 text-sm font-bold px-8 py-3 transition">Batal</button>
-                        <button type="submit"
-                            class="text-white bg-slate-900 hover:bg-black font-bold rounded-xl text-sm px-10 py-3 shadow-xl transition-all">Simpan
-                            & Terbitkan</button>
+
+
+                    <div class="md:col-span-2">
+                        <label class="block mb-2 text-sm font-bold text-slate-700 uppercase tracking-wider">Metode
+                            Pembayaran (Jika Ada Lomba Berbayar)</label>
+                        <select name="uid_payment_method"
+                            class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-ksc-blue block w-full p-3.5 outline-none font-bold">
+                            <option value="" disabled selected>-- Pilih Rekening Pembayaran --</option>
+                            @foreach ($payment_methods as $pm)
+                                <option value="{{ $pm['uid'] }}">{{ $pm['bank'] }} - {{ $pm['rekening'] }}
+                                    (a.n {{ $pm['atas_nama'] }})
+                                </option>
+                            @endforeach
+                        </select>
                     </div>
-                </form>
+
+                    <div class="md:col-span-2">
+                        <label class="block mb-2 text-sm font-bold text-slate-700 uppercase tracking-wider">Deskripsi &
+                            Peraturan</label>
+                        <div
+                            class="bg-slate-50 border border-slate-300 rounded-2xl overflow-hidden shadow-inner font-sans">
+                            <div id="editor-create-container" class="h-56 bg-white text-left"></div>
+                            <input type="hidden" name="deskripsi" id="deskripsi-input">
+                        </div>
+                    </div>
             </div>
+            <div class="flex items-center pt-8 mt-6 border-t border-slate-100 space-x-3 justify-end">
+                <button data-modal-hide="modal-tambah-event" type="button"
+                    class="text-slate-500 bg-white hover:bg-slate-50 rounded-xl border border-slate-200 text-sm font-bold px-8 py-3 transition">Batal</button>
+                <button type="submit"
+                    class="text-white bg-slate-900 hover:bg-black font-bold rounded-xl text-sm px-10 py-3 shadow-xl transition-all">Simpan
+                    & Terbitkan</button>
+            </div>
+            </form>
         </div>
+    </div>
     </div>
 
     @foreach ($events['data'] as $event)
         <div id="modal-edit-event-{{ $event['uid'] }}" tabindex="-1" aria-hidden="true"
-            class="hidden fixed top-0 left-0 right-0 z-[70] w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-full max-h-full flex items-center justify-center bg-slate-900/60 backdrop-blur-sm transition-opacity">
+            class="hidden fixed top-0 left-0 right-0 z-[70] w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-full max-h-full items-center justify-center bg-slate-900/60 backdrop-blur-sm transition-opacity">
             <div class="relative w-full max-w-4xl max-h-full">
                 <div class="relative bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
                     <div class="flex items-center justify-between p-4 md:p-6 border-b border-slate-100 bg-slate-50/50">
@@ -386,9 +524,41 @@
                         </button>
                     </div>
 
-                    <form id="form-edit-event" class="p-6 md:p-8 overflow-y-auto max-h-[75vh]"
+                    <form id="form-edit-event-{{ $event['uid'] }}" class="p-6 md:p-8 overflow-y-auto max-h-[75vh]"
                         action="{{ url('/' . $user['nama_role'] . '/' . $user['uid'] . '/' . $event['uid'] . '/dashboard/management-event/edit/process') }}"
-                        method="POST" enctype="multipart/form-data">
+                        method="POST" enctype="multipart/form-data" x-data="{
+                            tipe: 'berbayar',
+                            categories: {{ json_encode($categories) }},
+                            matches: {{ json_encode(
+                                array_map(function ($m) {
+                                    return [
+                                        'uid_category' => $m['uid_category'],
+                                        'nama_acara' => $m['nama_acara'],
+                                        'tipe_biaya' => $m['tipe_biaya'],
+                                        'biaya_pendaftaran' => $m['biaya_pendaftaran'],
+                                        'jumlah_seri' => $m['jumlah_seri'],
+                                        'waktu_mulai' => $m['waktu_mulai'] ?? '08:00',
+                                        'requirements' => array_map(function ($r) {
+                                            return [
+                                                'parameter_name' => $r['parameter_name'],
+                                                'operator' => $r['operator'],
+                                                'parameter_value' => $r['parameter_value'],
+                                            ];
+                                        }, $m['requirements'] ?? []),
+                                    ];
+                                }, $event['eventCategories'] ?? []),
+                            ) }},
+                            addMatch() { this.matches.push({ uid_category: '', nama_acara: '', tipe_biaya: 'berbayar', biaya_pendaftaran: 0, jumlah_seri: 1, waktu_mulai: '08:00', requirements: [] }); },
+                            updateMatchName(index) {
+                                const cat = this.categories.find(c => c.uid === this.matches[index].uid_category);
+                                if (cat) { this.matches[index].nama_acara = cat.nama_kategori; }
+                            },
+                            removeMatch(index) { this.matches.splice(index, 1); },
+                            addRequirement(matchIndex) {
+                                this.matches[matchIndex].requirements.push({ parameter_name: '', operator: '=', parameter_value: '' });
+                            },
+                            removeRequirement(matchIndex, reqIndex) { this.matches[matchIndex].requirements.splice(reqIndex, 1); }
+                        }">
                         @csrf
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
 
@@ -419,169 +589,280 @@
                                     </label>
                                 </div>
                             </div>
-
                             <div class="md:col-span-2">
                                 <label
                                     class="block mb-2 text-sm font-bold text-slate-700 uppercase tracking-wider text-left">Nama
                                     Event</label>
-                                <input type="text" name="nama_event" id="edit_nama_event"
-                                    value="{{ $event['nama_event'] }}"
-                                    class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-ksc-blue focus:border-ksc-blue block w-full p-3.5 outline-none"
+                                <input type="text" name="nama_event" value="{{ $event['nama_event'] }}"
+                                    class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-ksc-blue block w-full p-3.5 outline-none font-bold"
                                     required>
                             </div>
 
                             <div>
                                 <label
-                                    class="block mb-2 text-sm font-bold text-slate-700 uppercase tracking-wider">Kategori
-                                    Lomba</label>
-                                <select name="uid_kategori" id="edit_uid_kategori"
-                                    class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-ksc-blue block w-full p-3.5 outline-none">
-                                    @foreach ($categories as $category)
-                                        <option value="{{ $category['uid'] }}"
-                                            {{ $event['nama_kategori'] == $category['nama_kategori'] ? 'selected' : '' }}>
-                                            {{ $category['nama_kategori'] }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            <div>
-                                <label
-                                    class="block mb-2 text-sm font-bold text-slate-700 uppercase tracking-wider">Penyelenggara</label>
-                                <select name="uid_author" id="edit_uid_author"
-                                    class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-ksc-blue block w-full p-3.5 outline-none">
+                                    class="block mb-2 text-sm font-bold text-slate-700 uppercase tracking-wider text-left">Penyelenggara</label>
+                                <select name="uid_author"
+                                    class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-ksc-blue block w-full p-3.5 outline-none font-bold">
                                     @foreach ($authors as $author)
                                         <option value="{{ $author['uid'] }}"
-                                            {{ $event['author'] == $author['nama_lengkap'] ? 'selected' : '' }}>
+                                            {{ $event['uid_author'] == $author['uid'] ? 'selected' : '' }}>
                                             {{ $author['nama_lengkap'] }}</option>
                                     @endforeach
                                 </select>
                             </div>
 
-                            <div class="md:col-span-2">
-                                <label class="block mb-2 text-sm font-bold text-slate-700 uppercase tracking-wider">Lokasi
+                            <div>
+                                <label
+                                    class="block mb-2 text-sm font-bold text-slate-700 uppercase tracking-wider text-left">Lokasi
                                     Pertandingan</label>
-                                <input type="text" name="lokasi_event" id="edit_lokasi_event"
-                                    value="{{ $event['lokasi_event'] }}"
-                                    class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-ksc-blue block w-full p-3.5 outline-none"
+                                <input type="text" name="lokasi_event" value="{{ $event['lokasi_event'] }}"
+                                    class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-ksc-blue block w-full p-3.5 outline-none font-bold"
                                     required>
                             </div>
 
                             <div>
-                                <label class="block mb-2 text-sm font-bold text-slate-700 uppercase tracking-wider">Tanggal
-                                    Pelaksanaan</label>
-                                <input type="date" name="tanggal_event" id="edit_tanggal_event"
-                                    value="{{ $event['tanggal_event'] }}"
-                                    class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-xl block w-full p-3.5 outline-none focus:ring-2 focus:ring-ksc-blue"
-                                    required>
-                            </div>
-                            <div>
-                                <label class="block mb-2 text-sm font-bold text-slate-700 uppercase tracking-wider">Waktu
+                                <label
+                                    class="block mb-2 text-sm font-bold text-slate-700 uppercase tracking-wider text-left">Tanggal
                                     Mulai</label>
-                                <input type="time" name="waktu_event" id="edit_waktu_event"
-                                    value="{{ $event['waktu_event'] }}"
-                                    class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-xl block w-full p-3.5 outline-none focus:ring-2 focus:ring-ksc-blue"
+                                <input type="date" name="tanggal_mulai" value="{{ $event['tanggal_mulai'] }}"
+                                    class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-xl block w-full p-3.5 outline-none focus:ring-2 focus:ring-blue-500 font-bold"
                                     required>
                             </div>
 
                             <div>
-                                <label class="block mb-2 text-sm font-bold text-slate-700 uppercase tracking-wider">
-                                    Kuota Peserta
-                                </label>
-                                <input type="number" name="kuota_peserta" value="{{ $event['kuota_peserta'] }}"
-                                    min="1"
-                                    class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-xl block w-full p-3.5 outline-none focus:ring-2 focus:ring-ksc-blue"
+                                <label
+                                    class="block mb-2 text-sm font-bold text-slate-700 uppercase tracking-wider text-left">Tanggal
+                                    Selesai</label>
+                                <input type="date" name="tanggal_selesai" value="{{ $event['tanggal_selesai'] }}"
+                                    class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-xl block w-full p-3.5 outline-none focus:ring-2 focus:ring-blue-500 font-bold"
                                     required>
                             </div>
 
-                            <div x-data="{ tipeEdit: `{{ $event['tipe_event'] }}` }" id="edit-tipe-container">
-                                <label class="block mb-2 text-sm font-bold text-slate-700 uppercase tracking-wider">Tipe
-                                    Event</label>
-                                <div class="grid grid-cols-2 gap-3">
-                                    <label
-                                        class="flex items-center justify-center p-3.5 bg-slate-50 border border-slate-300 rounded-xl cursor-pointer hover:bg-slate-100 transition"
-                                        :class="tipeEdit === 'gratis' ? 'ring-2 ring-ksc-blue bg-blue-50 border-blue-200' :
-                                            ''">
-                                        <input type="radio" name="tipe_event" value="gratis" class="hidden"
-                                            x-model="tipeEdit" id="edit_tipe_gratis">
-                                        <span class="text-xs font-bold uppercase tracking-widest"
-                                            :class="tipeEdit === 'gratis' ? 'text-ksc-blue' : 'text-slate-500'">Gratis</span>
-                                    </label>
-                                    <label
-                                        class="flex items-center justify-center p-3.5 bg-slate-50 border border-slate-300 rounded-xl cursor-pointer hover:bg-slate-100 transition"
-                                        :class="tipeEdit === 'berbayar' ? 'ring-2 ring-ksc-blue bg-blue-50 border-blue-200' :
-                                            ''">
-                                        <input type="radio" name="tipe_event" value="berbayar" class="hidden"
-                                            x-model="tipeEdit" id="edit_tipe_berbayar">
-                                        <span class="text-xs font-bold uppercase tracking-widest"
-                                            :class="tipeEdit === 'berbayar' ? 'text-ksc-blue' : 'text-slate-500'">Berbayar</span>
-                                    </label>
-                                </div>
-                                <div x-show="tipeEdit === 'berbayar'" x-transition class="mt-4">
-                                    <label
-                                        class="block mb-2 text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Nominal
-                                        Biaya (IDR)</label>
-                                    <div class="relative mb-4">
-                                        <div
-                                            class="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-slate-400 text-sm">
-                                            Rp</div>
-                                        <input type="number" name="biaya_event" id="edit_biaya_event"
-                                            value="{{ $event['biaya_event'] }}"
-                                            class="bg-white border border-blue-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-ksc-blue block w-full p-3.5 pl-12 outline-none shadow-sm">
-                                    </div>
+                            <div>
+                                <label
+                                    class="block mb-2 text-sm font-bold text-slate-700 uppercase tracking-wider text-left">Waktu Mulai (WIB)</label>
+                                <input type="time" name="waktu_mulai" value="{{ $event['waktu_mulai'] }}"
+                                    class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-xl block w-full p-3.5 outline-none focus:ring-2 focus:ring-blue-500 font-bold"
+                                    required>
+                            </div>
 
-                                    <label
-                                        class="block mb-2 text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Metode
-                                        Pembayaran</label>
-                                    <select name="uid_payment_method"
-                                        class="bg-white border border-blue-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-ksc-blue block w-full p-3.5 outline-none shadow-sm"
-                                        :required="tipeEdit === 'berbayar'">
-                                        <option value="" disabled
-                                            {{ !$event['uid_payment_method'] ? 'selected' : '' }}>-- Pilih Rekening
-                                            Pembayaran --</option>
-                                        @foreach ($paymentMethods as $pm)
-                                            <option value="{{ $pm['uid'] }}"
-                                                {{ $event['uid_payment_method'] == $pm['uid'] ? 'selected' : '' }}>
-                                                {{ $pm['bank'] }} - {{ $pm['rekening'] }} (a.n {{ $pm['atas_nama'] }})
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
+                             <div>
+                                <label
+                                    class="block mb-2 text-sm font-bold text-slate-700 uppercase tracking-wider text-left">Jumlah Lintasan</label>
+                                <input type="number" name="jumlah_lintasan" value="{{ $event['jumlah_lintasan'] }}"
+                                    class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-ksc-blue block w-full p-3.5 outline-none font-bold"
+                                    required min="1">
                             </div>
 
                             <div class="md:col-span-2">
-                                <label class="block mb-2 text-sm font-bold text-slate-700 uppercase tracking-wider">Status
+                                <label
+                                    class="block mb-2 text-sm font-bold text-slate-700 uppercase tracking-wider text-left">Status
                                     Publikasi</label>
-                                <select name="status_event" id="edit_status_event"
-                                    class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-ksc-blue block w-full p-3.5 outline-none">
-                                    <option {{ $event['status_event'] === 'berjalan' ? 'selected' : '' }}
-                                        value="berjalan">
-                                        Berjalan (Registration Open)</option>
-                                    <option {{ $event['status_event'] === 'ditunda' ? 'selected' : '' }} value="ditunda">
-                                        Ditunda (Postponed)</option>
-                                    <option {{ $event['status_event'] === 'ditutup' ? 'selected' : '' }} value="ditutup">
-                                        Ditutup (Registration Closed)</option>
+                                <select name="status_event"
+                                    class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-ksc-blue block w-full p-3.5 outline-none font-bold">
+                                    <option value="berjalan" {{ $event['status_event'] == 'berjalan' ? 'selected' : '' }}>
+                                        Berjalan</option>
+                                    <option value="ditunda" {{ $event['status_event'] == 'ditunda' ? 'selected' : '' }}>
+                                        Ditunda</option>
+                                    <option value="ditutup" {{ $event['status_event'] == 'ditutup' ? 'selected' : '' }}>
+                                        Ditutup</option>
                                 </select>
                             </div>
 
-                            <div class="md:col-span-2">
-                                <label class="block mb-2 text-sm font-bold text-slate-700 uppercase tracking-wider">
-                                    Deskripsi & Peraturan
-                                </label>
+                            <!-- List Matches Section -->
+                            <div class="md:col-span-2 space-y-4 text-left">
+                                <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                                    <label
+                                        class="text-xs font-black text-slate-900 uppercase tracking-widest flex items-center gap-2">
+                                        <i data-lucide="list-checks" class="w-5 h-5 text-ksc-blue"></i> Daftar Lomba &
+                                        Biaya
+                                    </label>
+                                    <button type="button" @click="addMatch()"
+                                        class="text-[10px] font-bold bg-blue-50 text-ksc-blue px-3 py-1.5 rounded-lg hover:bg-ksc-blue hover:text-white transition flex items-center gap-1 uppercase">
+                                        <i data-lucide="plus" class="w-3 h-3"></i> Tambah Lomba
+                                    </button>
+                                </div>
+
+                                <div class="space-y-6 text-left">
+                                    <template x-for="(match, mIndex) in matches" :key="mIndex">
+                                        <div
+                                            class="bg-slate-50/50 border border-slate-200 p-6 rounded-2xl relative group shadow-sm text-left">
+                                            <button type="button" @click="removeMatch(mIndex)"
+                                                x-show="matches.length > 1"
+                                                class="absolute -top-2 -right-2 bg-red-100 text-red-600 p-2 rounded-full shadow-lg border-2 border-white hover:bg-red-600 hover:text-white transition z-10 text-center">
+                                                <i data-lucide="trash-2" class="w-4 h-4 text-center"></i>
+                                            </button>
+
+                                            <div
+                                                class="grid grid-cols-1 md:grid-cols-12 gap-5 text-left border-none shadow-none">
+                                                <div class="md:col-span-4 text-left">
+                                                    <label
+                                                        class="block mb-1 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">Pilih
+                                                        Gaya / Lomba</label>
+                                                    <select :name="'matches[' + mIndex + '][uid_category]'"
+                                                        x-model="match.uid_category" @change="updateMatchName(mIndex)"
+                                                        class="bg-white border border-slate-200 text-slate-900 text-sm font-bold rounded-xl focus:ring-2 focus:ring-blue-100 block w-full p-3 outline-none shadow-none"
+                                                        required>
+                                                        <option value="" disabled>-- Pilih Gaya --</option>
+                                                        <template x-for="cat in categories" :key="cat.uid">
+                                                            <option :value="cat.uid" x-text="cat.nama_kategori"
+                                                                :selected="cat.uid === match.uid_category"></option>
+                                                        </template>
+                                                    </select>
+                                                    <input type="hidden" :name="'matches[' + mIndex + '][nama_acara]'"
+                                                        :value="match.nama_acara">
+                                                </div>
+                                                <div class="md:col-span-2 text-left">
+                                                    <label
+                                                        class="block mb-1 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">Waktu</label>
+                                                    <input type="time" :name="'matches[' + mIndex + '][waktu_mulai]'"
+                                                        x-model="match.waktu_mulai"
+                                                        class="bg-white border border-slate-200 text-slate-900 text-sm font-bold rounded-xl focus:ring-2 focus:ring-blue-100 block w-full p-3 outline-none shadow-none"
+                                                        required>
+                                                </div>
+                                                <div class="md:col-span-2 text-left">
+                                                    <label
+                                                        class="block mb-1 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">Tipe</label>
+                                                    <select :name="'matches[' + mIndex + '][tipe_biaya]'"
+                                                        x-model="match.tipe_biaya"
+                                                        class="bg-white border border-slate-200 text-slate-900 text-sm font-bold rounded-xl focus:ring-2 focus:ring-blue-100 block w-full p-3 outline-none">
+                                                        <option value="berbayar">Berbayar</option>
+                                                        <option value="gratis">Gratis</option>
+                                                    </select>
+                                                </div>
+                                                <div class="md:col-span-2 text-left">
+                                                    <label
+                                                        class="block mb-1 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">Biaya</label>
+                                                    <input type="number"
+                                                        :name="'matches[' + mIndex + '][biaya_pendaftaran]'"
+                                                        x-model="match.biaya_pendaftaran"
+                                                        class="bg-white border border-slate-200 text-slate-900 text-sm font-bold rounded-xl focus:ring-2 focus:ring-blue-100 block w-full p-3 outline-none shadow-none"
+                                                        :disabled="match.tipe_biaya === 'gratis'"
+                                                        :class="match.tipe_biaya === 'gratis' ? 'opacity-50 bg-slate-100' :
+                                                            ''"
+                                                        required>
+                                                </div>
+                                                <div class="md:col-span-2 text-left">
+                                                    <label
+                                                        class="block mb-1 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">Jumlah Seri</label>
+                                                    <input type="number" :name="'matches[' + mIndex + '][jumlah_seri]'"
+                                                        x-model="match.jumlah_seri"
+                                                        class="bg-white border border-slate-200 text-slate-900 text-sm font-bold rounded-xl focus:ring-2 focus:ring-blue-100 block w-full p-3 outline-none shadow-none"
+                                                        placeholder="1" required min="1">
+                                                </div>
+
+                                                <div class="md:col-span-12 mt-4 text-left border-none shadow-none">
+                                                    <div
+                                                        class="p-5 bg-white border border-slate-100 rounded-xl shadow-inner text-left border-none shadow-none">
+                                                        <div class="flex items-center justify-between mb-4">
+                                                            <h4
+                                                                class="text-xs font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                                                                <i data-lucide="shield-check"
+                                                                    class="w-4 h-4 text-blue-500"></i> Syarat Partisipasi
+                                                            </h4>
+                                                            <button type="button" @click="addRequirement(mIndex)"
+                                                                class="text-[10px] bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-black transition font-bold flex items-center gap-2">
+                                                                <i data-lucide="plus" class="w-3.5 h-3.5"></i> Tambah
+                                                            </button>
+                                                        </div>
+
+                                                        <div class="space-y-3 text-left border-none shadow-none">
+                                                            <template x-for="(req, reqIndex) in match.requirements"
+                                                                :key="reqIndex">
+                                                                <div
+                                                                    class="grid grid-cols-1 md:grid-cols-12 gap-3 items-center bg-slate-50 p-3 rounded-lg border border-slate-100 text-left border-none shadow-none">
+                                                                    <div class="md:col-span-4 text-left">
+                                                                        <select
+                                                                            :name="'matches[' + mIndex + '][requirements][' +
+                                                                                reqIndex + '][parameter_name]'"
+                                                                            x-model="req.parameter_name"
+                                                                            class="w-full text-xs font-bold px-3 py-2 bg-white border border-slate-200 rounded-lg shadow-none">
+                                                                            <option value="">Parameter</option>
+                                                                            <option value="gender">Jenis Kelamin</option>
+                                                                            <option value="birth_year">Tahun Lahir</option>
+                                                                            <option value="age_min">Umur Min</option>
+                                                                            <option value="age_max">Umur Max</option>
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="md:col-span-2 text-left">
+                                                                        <select
+                                                                            :name="'matches[' + mIndex + '][requirements][' +
+                                                                                reqIndex + '][operator]'"
+                                                                            x-model="req.operator"
+                                                                            class="w-full text-xs font-bold px-3 py-2 bg-white border border-slate-200 rounded-lg">
+                                                                            <option value="="> = </option>
+                                                                            <option value=">"> > </option>
+                                                                            <option value="<">< </option>
+                                                                            <option value=">="> >= </option>
+                                                                            <option value="<="> <= </option>
+                                                                            <option value="IN"> DI DALAM </option>
+                                                                        </select>
+                                                                    </div>
+                                                                    <div
+                                                                        class="md:col-span-5 text-left text-left text-left">
+                                                                        <input type="text"
+                                                                            :name="'matches[' + mIndex + '][requirements][' +
+                                                                                reqIndex + '][parameter_value]'"
+                                                                            x-model="req.parameter_value"
+                                                                            placeholder="Nilai"
+                                                                            class="w-full text-xs font-bold px-3 py-2 bg-white border border-slate-200 rounded-lg">
+                                                                    </div>
+                                                                    <div
+                                                                        class="md:col-span-1 flex justify-center text-left pt-2 md:pt-0">
+                                                                        <button type="button"
+                                                                            @click="removeRequirement(mIndex, reqIndex)"
+                                                                            class="p-2 text-red-400 hover:text-red-600 transition"><i
+                                                                                data-lucide="x"
+                                                                                class="w-4 h-4"></i></button>
+                                                                    </div>
+                                                                </div>
+                                                            </template>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+
+
+                            <div class="md:col-span-2 text-left">
+                                <label
+                                    class="block mb-2 text-sm font-bold text-slate-700 uppercase tracking-wider text-left">Metode
+                                    Pembayaran</label>
+                                <select name="uid_payment_method"
+                                    class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-ksc-blue block w-full p-3.5 outline-none font-bold">
+                                    <option value="" disabled selected>-- Pilih Rekening Pembayaran --</option>
+                                    @foreach ($payment_methods as $pm)
+                                        <option value="{{ $pm['uid'] }}"
+                                            {{ $event['uid_payment_method'] == $pm['uid'] ? 'selected' : '' }}>
+                                            {{ $pm['bank'] }} - {{ $pm['rekening'] }} (a.n {{ $pm['atas_nama'] }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="md:col-span-2 text-left">
+                                <label
+                                    class="block mb-2 text-sm font-bold text-slate-700 uppercase tracking-wider text-left capitalize">Deskripsi
+                                    & Peraturan</label>
                                 <div
-                                    class="bg-slate-50 border border-slate-300 rounded-2xl overflow-hidden shadow-inner font-sans">
+                                    class="bg-slate-50 border border-slate-300 rounded-2xl overflow-hidden font-sans shadow-inner">
                                     <div id="edit-editor-{{ $event['uid'] }}" class="h-56 bg-white text-left">
                                         {!! $event['deskripsi'] !!}
                                     </div>
                                     <input type="hidden" name="deskripsi" id="edit-deskripsi-input-{{ $event['uid'] }}"
-                                        value="{{ $event['deskripsi'] }}">
+                                        value="{{ htmlspecialchars($event['deskripsi'] ?? '') }}">
                                 </div>
                             </div>
                         </div>
+
                         <div class="flex items-center pt-8 mt-6 border-t border-slate-100 space-x-3 justify-end">
                             <button data-modal-hide="modal-edit-event-{{ $event['uid'] }}" type="button"
-                                class="text-slate-500 bg-white hover:bg-slate-50 rounded-xl border border-slate-200 text-sm font-bold px-8 py-3 transition">Batal</button>
+                                class="text-slate-500 bg-white hover:bg-slate-50 rounded-xl border border-slate-200 text-sm font-bold px-8 py-3 transition shadow-none border-slate-200">Batal</button>
                             <button type="submit"
-                                class="text-white bg-slate-900 hover:bg-black font-bold rounded-xl text-sm px-10 py-3 shadow-xl transition-all">Simpan
+                                class="text-white bg-slate-900 hover:bg-black font-bold rounded-xl text-sm px-10 py-3 shadow-xl transition-all shadow-none">Simpan
                                 Perubahan</button>
                         </div>
                     </form>

@@ -82,7 +82,7 @@
                 @include('layouts.layout-dashboard.navbar')
 
                 <div class="pt-6 border-t border-slate-100">
-                    <a href="{{ url('/') . $user['nama_role'] . '/' . $user['uid'] . '/dashboard/logout' }}"
+                    <a href="{{ url('/logout') }}"
                         class="flex gap-2 text-red-600">
                         <i data-lucide="log-out" class="w-5 h-5 group-hover:-translate-x-1 transition"></i>
                         <span class="font-bold text-sm">Keluar Akun</span>
@@ -200,7 +200,7 @@
 
                             <div class="my-1 h-px bg-slate-100"></div>
 
-                            <a href="{{ url('/') . $user['nama_role'] . '/' . $user['uid'] . '/dashboard/logout' }}"
+                            <a href="{{ url('/logout') }}"
                                 class="flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 font-medium">
                                 <i data-lucide="log-out" class="w-4 h-4"></i>
                                 <span>Keluar</span>

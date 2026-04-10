@@ -9,23 +9,23 @@
         <p class="px-2 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 text-left">Main Menu</p>
 
         {{-- Dashboard: Semua Role --}}
-        <a href="{{ url('/' . $user['nama_role'] . '/dashboard') }}"
+        <a href="{{ url('/' . $user->nama_role . '/dashboard') }}"
             class="{{ request()->is('*/dashboard') && !request()->is('*/dashboard/*') ? 'sidebar-item-active shadow-lg shadow-blue-100' : '' }} flex items-center gap-3 px-4 py-3 rounded-xl transition group hover:bg-slate-50">
             <i data-lucide="layout-dashboard"
                 class="w-5 h-5 {{ request()->is('*/dashboard') && !request()->is('*/dashboard/*') ? 'text-white' : 'text-slate-500 group-hover:text-ksc-blue' }}"></i>
             <span class="text-sm font-medium">Dashboard</span>
         </a>
 
-        {{-- Event Menu for Members --}}
-        @if ($user['nama_role'] == 'member')
-            <a href="{{ url('/' . $user['nama_role'] . '/dashboard/event') }}"
+        {{-- Event Menu for Atlet/Members --}}
+        @if ($user->can('register-event'))
+            <a href="{{ url('/' . $user->nama_role . '/dashboard/event') }}"
                 class="{{ request()->is('*/dashboard/event*') ? 'sidebar-item-active shadow-lg shadow-blue-100' : '' }} flex items-center gap-3 px-4 py-3 rounded-xl transition group hover:bg-slate-50">
                 <i data-lucide="calendar-check"
                     class="w-5 h-5 {{ request()->is('*/dashboard/event*') ? 'text-white' : 'text-slate-500 group-hover:text-ksc-blue' }}"></i>
                 <span class="text-sm font-medium">Event</span>
             </a>
 
-            <a href="{{ url('/' . $user['nama_role'] . '/dashboard/registration-history') }}"
+            <a href="{{ url('/' . $user->nama_role . '/dashboard/registration-history') }}"
                 class="{{ request()->is('*/dashboard/registration-history*') ? 'sidebar-item-active shadow-lg shadow-blue-100' : '' }} flex items-center gap-3 px-4 py-3 rounded-xl transition group hover:bg-slate-50">
                 <i data-lucide="history"
                     class="w-5 h-5 {{ request()->is('*/dashboard/registration-history*') ? 'text-white' : 'text-slate-500 group-hover:text-ksc-blue' }}"></i>
@@ -34,7 +34,7 @@
         @endif
     </div>
 
-    @if ($user['nama_role'] == 'admin')
+    @if ($user->can('manage-payments'))
         <div x-data="{ open: {{ request()->is('*/management-payment*') ? 'true' : 'false' }} }">
             <button @click="open = !open"
                 class="w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl transition group hover:bg-slate-50">
@@ -47,7 +47,7 @@
             </button>
 
             <div x-show="open" x-cloak x-collapse class="mt-1 ml-4 pl-4 border-l-2 border-slate-100 space-y-1">
-                <a href="{{ url('/' . $user['nama_role'] . '/dashboard/management-payment') }}"
+                <a href="{{ url('/' . $user->nama_role . '/dashboard/management-payment') }}"
                     class="{{ request()->is('*/management-payment') ? 'text-ksc-blue font-black' : 'text-slate-500 hover:text-ksc-blue font-medium' }} block py-2 text-xs transition text-left">
                     Metode Pembayaran
                 </a>
@@ -55,7 +55,7 @@
         </div>
     @endif
 
-    @if ($user['nama_role'] == 'admin' || $user['nama_role'] == 'coach')
+    @if ($user->can('manage-events') || $user->can('manage-categories'))
         <div x-data="{ open: {{ request()->is('*/management-category*') ||
         request()->is('*/management-event*') ||
         request()->is('*/management-registration*') ||
@@ -73,29 +73,37 @@
             </button>
 
             <div x-show="open" x-cloak x-collapse class="mt-1 ml-4 pl-4 border-l-2 border-slate-100 space-y-1">
-                <a href="{{ url('/' . $user['nama_role'] . '/dashboard/management-category') }}"
+                
+                @if ($user->can('manage-categories'))
+                <a href="{{ url('/' . $user->nama_role . '/dashboard/management-category') }}"
                     class="{{ request()->is('*/management-category') || request()->is('*/management-category/page/*') ? 'text-ksc-blue font-black' : 'text-slate-500 hover:text-ksc-blue font-medium' }} block py-2 text-xs transition text-left">
-                    Manajemen Kategori
+                    Manajemen Gaya
                 </a>
-                <a href="{{ url('/' . $user['nama_role'] . '/dashboard/management-event') }}"
+                @endif 
+               
+                
+                @if ($user->can('manage-events'))
+                <a href="{{ url('/' . $user->nama_role . '/dashboard/management-event') }}"
                     class="{{ request()->is('*/management-event') || request()->is('*/management-event/page/*') ? 'text-ksc-blue font-black' : 'text-slate-500 hover:text-ksc-blue font-medium' }} block py-2 text-xs transition text-left">
                     Manajemen Event
                 </a>
-                <a href="{{ url('/' . $user['nama_role'] . '/dashboard/management-registration') }}"
+                <a href="{{ url('/' . $user->nama_role . '/dashboard/management-registration') }}"
                     class="{{ request()->is('*/management-registration') ? 'text-ksc-blue font-black' : 'text-slate-500 hover:text-ksc-blue font-medium' }} block py-2 text-xs transition text-left">
                     Manajemen Pendaftaran
                 </a>
-                {{-- Menu Baru: Manajemen Galeri --}}
-                <a href="{{ url('/' . $user['nama_role'] . '/dashboard/management-gallery') }}"
+                @endif
+                
+                @if ($user->can('manage-gallery'))
+                <a href="{{ url('/' . $user->nama_role . '/dashboard/management-gallery') }}"
                     class="{{ request()->is('*/management-gallery') ? 'text-ksc-blue font-black' : 'text-slate-500 hover:text-ksc-blue font-medium' }} block py-2 text-xs transition text-left">
                     Manajemen Galeri
                 </a>
+                @endif
             </div>
         </div>
     @endif
 
-    {{-- 3. SDM & ANGGOTA (Akses: Admin & Coach) --}}
-    @if ($user['nama_role'] == 'admin' || $user['nama_role'] == 'coach')
+    @if ($user->can('manage-users'))
         <div x-data="{ open: {{ request()->is('*/management-user*') || request()->is('*/management-coach*') || request()->is('*/management-member*') ? 'true' : 'false' }} }">
             <button @click="open = !open"
                 class="w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl transition group hover:bg-slate-50">
@@ -108,20 +116,15 @@
             </button>
 
             <div x-show="open" x-cloak x-collapse class="mt-1 ml-4 pl-4 border-l-2 border-slate-100 space-y-1">
-                {{-- Khusus Admin --}}
-                @if ($user['nama_role'] == 'admin')
-                    <a href="{{ url('/' . $user['nama_role'] . '/dashboard/management-user') }}"
-                        class="{{ request()->is('*/management-user') ? 'text-ksc-blue font-black' : 'text-slate-500 hover:text-ksc-blue font-medium' }} block py-2 text-xs transition text-left">
-                        Manajemen Pengguna
-                    </a>
-                    <a href="{{ url('/' . $user['nama_role'] . '/dashboard/management-coach') }}"
-                        class="{{ request()->is('*/management-coach') ? 'text-ksc-blue font-black' : 'text-slate-500 hover:text-ksc-blue font-medium' }} block py-2 text-xs transition text-left">
-                        Manajemen Pelatih
-                    </a>
-                @endif
-
-                {{-- Admin & Coach --}}
-                <a href="{{ url('/' . $user['nama_role'] . '/dashboard/management-member') }}"
+                <a href="{{ url('/' . $user->nama_role . '/dashboard/management-user') }}"
+                    class="{{ request()->is('*/management-user') ? 'text-ksc-blue font-black' : 'text-slate-500 hover:text-ksc-blue font-medium' }} block py-2 text-xs transition text-left">
+                    Manajemen Pengguna
+                </a>
+                <a href="{{ url('/' . $user->nama_role . '/dashboard/management-coach') }}"
+                    class="{{ request()->is('*/management-coach') ? 'text-ksc-blue font-black' : 'text-slate-500 hover:text-ksc-blue font-medium' }} block py-2 text-xs transition text-left">
+                    Manajemen Pelatih
+                </a>
+                <a href="{{ url('/' . $user->nama_role . '/dashboard/management-member') }}"
                     class="{{ request()->is('*/management-member') ? 'text-ksc-blue font-black' : 'text-slate-500 hover:text-ksc-blue font-medium' }} block py-2 text-xs transition text-left">
                     Manajemen Member
                 </a>
@@ -129,9 +132,8 @@
         </div>
     @endif
 
-    {{-- 4. LAPORAN & EXPORT (Akses: Admin & Coach) --}}
-    @if ($user['nama_role'] == 'admin' || $user['nama_role'] == 'coach')
-        <a href="{{ url('/' . $user['nama_role'] . '/dashboard/export-reports') }}"
+    @if ($user->can('export-reports'))
+        <a href="{{ url('/' . $user->nama_role . '/dashboard/export-reports') }}"
             class="{{ request()->is('*/export-reports') ? 'sidebar-item-active shadow-lg shadow-blue-100' : '' }} flex items-center gap-3 px-4 py-3 rounded-xl transition group hover:bg-slate-50">
             <i data-lucide="file-spreadsheet"
                 class="w-5 h-5 {{ request()->is('*/export-reports') ? 'text-white' : 'text-slate-500 group-hover:text-ksc-blue' }}"></i>
@@ -144,14 +146,14 @@
         <p class="px-2 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 text-left">Personal Menu
         </p>
 
-        <a href="{{ url('/' . $user['nama_role'] . '/dashboard/notifications') }}"
+        <a href="{{ url('/' . $user->nama_role . '/dashboard/notifications') }}"
             class="{{ request()->is('*/notifications') ? 'sidebar-item-active shadow-lg shadow-blue-100' : '' }} flex items-center gap-3 px-4 py-3 rounded-xl transition group hover:bg-slate-50">
             <i data-lucide="bell"
                 class="w-5 h-5 {{ request()->is('*/notifications') ? 'text-white' : 'text-slate-500 group-hover:text-ksc-blue' }}"></i>
             <span class="text-sm font-medium">Notifikasi</span>
         </a>
 
-        <a href="{{ url('/' . $user['nama_role'] . '/dashboard/my-profile') }}"
+        <a href="{{ url('/' . $user->nama_role . '/dashboard/my-profile') }}"
             class="{{ request()->is('*/my-profile') ? 'sidebar-item-active shadow-lg shadow-blue-100' : '' }} flex items-center gap-3 px-4 py-3 rounded-xl transition group hover:bg-slate-50 text-left">
             <i data-lucide="user-circle"
                 class="w-5 h-5 {{ request()->is('*/my-profile') ? 'text-white' : 'text-slate-500 group-hover:text-ksc-blue' }}"></i>

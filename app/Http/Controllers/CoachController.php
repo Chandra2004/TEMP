@@ -25,11 +25,13 @@ class CoachController extends DashboardController
         return View::render('dashboard.admin.coach', array_merge($this->dataTetap, [
             'title' => 'Manajemen Pelatih ' . Helper::session_get("user")['nama_role'] . ' | Khafid Swimming Club (KSC) - Official Website',
             'coaches' => User::query()
-                ->select(['users.*', 'roles.nama_role'])
-                ->join('roles', 'users.uid_role', '=', 'roles.uid')
-                ->where('roles.nama_role', '=', 'coach')
+                ->select(['users.*', 'roles.name as nama_role', 'data_users.*', 'users.id as id', 'users.uid as uid'])
+                ->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
+                ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
+                ->join('data_users', 'users.uid', '=', 'data_users.uid_user')
+                ->where('roles.name', '=', 'pelatih')
                 ->all(),
-            'roleCoach' => Role::where('nama_role', 'coach')->first()
+            'roleCoach' => Role::where('name', 'pelatih')->first()
         ]));
     }
 
@@ -42,14 +44,8 @@ class CoachController extends DashboardController
 
             $data = $request->validated();
 
-            // Cari UID Role Coach secara otomatis
-            $coachRole = Role::where('nama_role', 'coach')->first();
-            if (!$coachRole) {
-                throw new Exception('Role "coach" tidak ditemukan di database.');
-            }
-
             $data['uid'] = Helper::uuid();
-            $data['uid_role'] = $coachRole['uid'];
+            $data['nama_role'] = 'pelatih';
             $data['password'] = Helper::hash_password($data['password']);
             $data['is_active'] = 1; // Default aktif untuk pelatih yang didaftarkan admin
 

@@ -12,9 +12,12 @@
                 Username</label>
             <div class="relative">
                 <i data-lucide="user" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500"></i>
-                <input name="email" value="{{ old('email') }}" type="text" placeholder="Masukkan email anda"
+                <input name="email" value="{{ old('email') }}" type="text" placeholder="Masukkan email atau username"
                     class="w-full bg-white/5 border border-white/10 rounded-2xl px-12 py-3.5 text-white outline-none focus:ring-2 focus:ring-ksc-blue focus:border-transparent transition">
             </div>
+            @if(has_error('email'))
+                <p class="text-red-500 text-[10px] mt-1.5 ml-1 font-bold italic tracking-wide">⚠ {{ error('email') }}</p>
+            @endif
         </div>
 
         <div>
@@ -24,6 +27,9 @@
                 <input name="password" type="password" placeholder="••••••••"
                     class="w-full bg-white/5 border border-white/10 rounded-2xl px-12 py-3.5 text-white outline-none focus:ring-2 focus:ring-ksc-blue focus:border-transparent transition">
             </div>
+            @if(has_error('password'))
+                <p class="text-red-500 text-[10px] mt-1.5 ml-1 font-bold italic tracking-wide">⚠ {{ error('password') }}</p>
+            @endif
         </div>
 
         <div class="flex items-center justify-between text-xs pb-2">

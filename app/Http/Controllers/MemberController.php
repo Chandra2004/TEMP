@@ -25,11 +25,13 @@ class MemberController extends DashboardController
         return View::render('dashboard.general.member', array_merge($this->dataTetap, [
             'title' => 'Manajemen Member ' . Helper::session_get("user")['nama_role'] . ' | Khafid Swimming Club (KSC) - Official Website',
             'members' => User::query()
-                ->select(['users.*', 'roles.nama_role'])
-                ->join('roles', 'users.uid_role', '=', 'roles.uid')
-                ->where('roles.nama_role', '=', 'member')
+                ->select(['users.*', 'roles.name as nama_role', 'data_users.*', 'users.id as id', 'users.uid as uid'])
+                ->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
+                ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
+                ->join('data_users', 'users.uid', '=', 'data_users.uid_user')
+                ->where('roles.name', '=', 'atlet')
                 ->all(),
-            'roleMember' => Role::where('nama_role', 'member')->first()
+            'roleMember' => Role::where('name', 'atlet')->first()
         ]));
     }
 
@@ -42,13 +44,8 @@ class MemberController extends DashboardController
 
             $data = $request->validated();
 
-            $memberRole = Role::where('nama_role', 'member')->first();
-            if (!$memberRole) {
-                throw new Exception('Role "member" tidak ditemukan di database.');
-            }
-
             $data['uid'] = Helper::uuid();
-            $data['uid_role'] = $memberRole['uid'];
+            $data['nama_role'] = 'atlet';
             $data['password'] = Helper::hash_password($data['password']);
             $data['is_active'] = 1;
 

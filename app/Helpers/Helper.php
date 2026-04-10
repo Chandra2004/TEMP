@@ -452,5 +452,148 @@ class Helper
         // Otherwise, construct the full fallback URL.
         return self::url($fallback);
     }
+}
 
+/**
+ * Premium Debugging Utility
+ * Dump and Die with elegance.
+ */
+if (!function_exists('dd')) {
+    function dd(...$args)
+    {
+        if (PHP_SAPI === 'cli') {
+            foreach ($args as $arg) {
+                var_dump($arg);
+            }
+            die(1);
+        }
+
+        echo '
+        <style>
+            .tf-debug-container {
+                background: #0f172a;
+                color: #cbd5e1;
+                font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+                font-size: 14px;
+                padding: 24px;
+                border-radius: 12px;
+                margin: 20px;
+                box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.5);
+                border: 1px solid #1e293b;
+                line-height: 1.6;
+                overflow: hidden;
+            }
+            .tf-debug-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 20px;
+                padding-bottom: 12px;
+                border-bottom: 1px solid #1e293b;
+            }
+            .tf-debug-badge {
+                background: #1e3a8a;
+                color: #60a5fa;
+                padding: 4px 12px;
+                border-radius: 9999px;
+                font-size: 11px;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+            }
+            .tf-debug-trace {
+                font-size: 12px;
+                color: #64748b;
+            }
+            .tf-debug-content {
+                overflow-x: auto;
+            }
+            .tf-type-string { color: #38bdf8; }
+            .tf-type-int { color: #f59e0b; }
+            .tf-type-bool { color: #f472b6; }
+            .tf-type-object { color: #818cf8; font-weight: bold; }
+            .tf-type-array { color: #94a3b8; }
+            .tf-key { color: #94a3b8; }
+            .tf-arrow { color: #475569; margin: 0 8px; }
+            pre { margin: 0; white-space: pre-wrap; word-break: break-all; }
+            .tf-collapsed-toggle { 
+                cursor: pointer; 
+                user-select: none;
+                display: inline-flex;
+                align-items: center;
+            }
+            .tf-collapsed-toggle:hover { color: #f8fafc; }
+        </style>
+        ';
+
+        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
+        $file = $trace['file'] ?? 'Unknown';
+        $line = $trace['line'] ?? '0';
+
+        echo '<div class="tf-debug-container">';
+        echo '<div class="tf-debug-header">';
+        echo '<span class="tf-debug-badge">THE FRAMEWORK v5.0 BUG HUNTER</span>';
+        echo '<span class="tf-debug-trace">' . basename($file) . ':' . $line . '</span>';
+        echo '</div>';
+        echo '<div class="tf-debug-content">';
+
+        foreach ($args as $arg) {
+            echo '<pre>';
+            tf_dump_recursive($arg);
+            echo '</pre>';
+        }
+
+        echo '</div></div>';
+        die(1);
+    }
+}
+
+if (!function_exists('tf_dump_recursive')) {
+    function tf_dump_recursive($var, $indent = 0)
+    {
+        $spacing = str_repeat('    ', $indent);
+        
+        if (is_null($var)) {
+            echo '<span class="tf-type-bool">NULL</span>';
+        } elseif (is_bool($var)) {
+            echo '<span class="tf-type-bool">' . ($var ? 'true' : 'false') . '</span>';
+        } elseif (is_int($var) || is_float($var)) {
+            echo '<span class="tf-type-int">' . $var . '</span>';
+        } elseif (is_string($var)) {
+            echo '<span class="tf-type-string">"' . htmlspecialchars($var) . '"</span> <span style="font-size: 10px; color: #475569;">(' . strlen($var) . ')</span>';
+        } elseif (is_array($var)) {
+            $count = count($var);
+            echo '<span class="tf-type-array">array:' . $count . '</span> [';
+            if ($count > 0) {
+                echo "\n";
+                foreach ($var as $key => $val) {
+                    echo $spacing . '    <span class="tf-key">' . (is_string($key) ? '"' . $key . '"' : $key) . '</span><span class="tf-arrow">=></span>';
+                    tf_dump_recursive($val, $indent + 1);
+                    echo "\n";
+                }
+                echo $spacing;
+            }
+            echo ']';
+        } elseif (is_object($var)) {
+            $class = get_class($var);
+            echo '<span class="tf-type-object">' . $class . '</span> {';
+            $props = (array)$var;
+            if (!empty($props)) {
+                echo "\n";
+                foreach ($props as $key => $val) {
+                    // Clean up private/protected property names
+                    $key = str_replace("\0*\0", '(protected) ', $key);
+                    $key = str_replace("\0" . $class . "\0", '(private) ', $key);
+                    
+                    echo $spacing . '    <span class="tf-key">' . $key . '</span><span class="tf-arrow">=></span>';
+                    tf_dump_recursive($val, $indent + 1);
+                    echo "\n";
+                }
+                echo $spacing;
+            }
+            echo '}';
+        } else {
+            var_dump($var);
+        }
+    }
 }

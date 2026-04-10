@@ -28,16 +28,26 @@ class RoleMiddleware implements Middleware {
             exit();
         }
         
-        // 2. Ambil role user asli dari database (Real-time)
-        $user_from_db = User::query()
-            ->select('roles.nama_role')
-            ->join('roles', 'users.uid_role', '=', 'roles.uid')
-            ->where('users.uid', '=', $user_session['uid'])
-            ->first();
-
+        // 2. Ambil user instance dan cek role menggunakan method hasRole()
+        $user = User::find($user_session['id']);
+        
         $currentRole = null;
-        if (!empty($user_from_db) && isset($user_from_db['nama_role'])) {
-            $currentRole = strtolower($user_from_db['nama_role']);
+        if ($user) {
+            foreach ($this->allowedRoles as $role) {
+                if ($user->hasRole($role)) {
+                    $currentRole = $role;
+                    break;
+                }
+            }
+        }
+
+        // 0. Superadmin bypass (ALL IN)
+        if ($user && $user->hasRole('superadmin')) {
+            return;
+        }
+
+        if (!$currentRole) {
+            error_log("Access Denied: User " . $user_session['uid'] . " has no authorized role.");
         }
 
         // 3. Ambil role yang diminta dari URL segment pertama

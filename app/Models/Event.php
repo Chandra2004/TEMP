@@ -26,8 +26,10 @@ class Event extends Model
 
     protected $fillable = [
         'uid',
-        'banner_event',
         'nama_event',
+        'banner_event',
+        'logo_kiri',
+        'logo_kanan',
         'deskripsi',
         'lokasi_event',
         'waktu_event',
@@ -37,9 +39,10 @@ class Event extends Model
         'kuota_peserta',
         'tipe_event',
         'slug',
-        'uid_kategori',
+        'uid_klub',
         'uid_author',
-        'uid_payment_method'
+        'uid_payment_method',
+        'jumlah_lintasan'
     ];
 
     protected $hidden = [
@@ -50,9 +53,9 @@ class Event extends Model
         // 'slug'
     ];
 
-    public function registrations()
+    public function eventCategories()
     {
-        return $this->hasMany(Registration::class, 'uid_event', 'uid');
+        return $this->hasMany(EventCategory::class, 'uid_event', 'uid');
     }
 
     public function category()
@@ -62,7 +65,9 @@ class Event extends Model
 
     public function author()
     {
-        return $this->hasOne(User::class, 'uid', 'uid_author')->select(['nama_lengkap']);
+        return $this->hasOne(User::class, 'uid', 'uid_author')
+            ->join('data_users', 'users.uid', '=', 'data_users.uid_user')
+            ->select(['users.uid', 'data_users.nama_lengkap']);
     }
 
     public function addEvent($data)

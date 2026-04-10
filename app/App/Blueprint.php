@@ -151,6 +151,11 @@ class Blueprint
         return $this;
     }
 
+    public function ipAddress($column)
+    {
+        return $this->string($column, 45);
+    }
+
     public function integer($column, $unsigned = false)
     {
         $this->lastAddedColumn = $column;
@@ -162,6 +167,19 @@ class Blueprint
     public function unsignedInteger($column)
     {
         return $this->integer($column, true);
+    }
+
+    public function bigInteger($column, $unsigned = false)
+    {
+        $this->lastAddedColumn = $column;
+        $unsigned = $unsigned ? " UNSIGNED" : "";
+        $this->addColumnSql("`$column` BIGINT$unsigned");
+        return $this;
+    }
+
+    public function unsignedBigInteger($column)
+    {
+        return $this->bigInteger($column, true);
     }
 
     public function text($column)
@@ -195,10 +213,20 @@ class Blueprint
 
     public function timestamps()
     {
-        // Add the default back here where it\'s intended.
+        // Add the default back here where it's intended.
         $this->timestamp('created_at')->default('CURRENT_TIMESTAMP');
         $this->timestamp('updated_at')->nullable()->default('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP');
         return $this;
+    }
+
+    public function softDeletes()
+    {
+        return $this->timestamp('deleted_at')->nullable();
+    }
+
+    public function dropSoftDeletes()
+    {
+        return $this->dropColumn('deleted_at');
     }
 
     public function date($column)
@@ -261,11 +289,19 @@ class Blueprint
 
     public function default($value)
     {
+        if (is_bool($value)) {
+            $value = $value ? 1 : 0;
+        }
         $defaultValue = is_string($value) && strtoupper($value) !== 'CURRENT_TIMESTAMP' && strpos($value, 'CURRENT_TIMESTAMP') === false
             ? "'$value'"
             : $value;
         $this->modifyLastColumn(" DEFAULT $defaultValue");
         return $this;
+    }
+
+    public function useCurrent()
+    {
+        return $this->default('CURRENT_TIMESTAMP');
     }
 
     public function unsigned()
@@ -308,7 +344,12 @@ class Blueprint
     {
         $column = $column ?: $this->lastAddedColumn;
         if ($column) {
-            $this->addIndexSql("UNIQUE (`$column`)");
+            if (is_array($column)) {
+                $columnList = implode("`, `", $column);
+                $this->addIndexSql("UNIQUE (`$columnList`)");
+            } else {
+                $this->addIndexSql("UNIQUE (`$column`)");
+            }
         }
         return $this;
     }
@@ -317,7 +358,13 @@ class Blueprint
     {
         $column = $column ?: $this->lastAddedColumn;
         if ($column) {
-            $this->addIndexSql("INDEX idx_$column (`$column`)");
+            if (is_array($column)) {
+                $columnList = implode("`, `", $column);
+                $indexName = "idx_" . implode("_", $column);
+                $this->addIndexSql("INDEX `$indexName` (`$columnList`)");
+            } else {
+                $this->addIndexSql("INDEX idx_$column (`$column`)");
+            }
         }
         return $this;
     }

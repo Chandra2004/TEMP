@@ -29,13 +29,18 @@ class UserController extends DashboardController
             'users' => User::query()
                 ->select([
                     'users.*',
-                    'roles.nama_role'
+                    'roles.name as nama_role',
+                    'data_users.*',
+                    'users.id as id',
+                    'users.uid as uid'
                 ])
-                ->join('roles', 'users.uid_role', '=', 'roles.uid')
+                ->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
+                ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
+                ->leftJoin('data_users', 'users.uid', '=', 'data_users.uid_user')
                 ->all(),
             'roles' => Role::query()->select([
                 'uid',
-                'nama_role'
+                'name as nama_role'
             ])->all()
         ]));
     }

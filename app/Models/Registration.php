@@ -20,37 +20,53 @@ use TheFramework\Helpers\Helper;
 class Registration extends Model
 {
     protected $table = 'registrations';
-    protected $primaryKey = 'id_registration';
+    protected $primaryKey = 'id';
 
     protected $fillable = [
         'uid',
         'nomor_pendaftaran',
         'uid_user',
-        'uid_event',
-        'status',
-        'tanggal_registrasi'
+        'uid_event_category',
+        'seed_time',
+        'status_pendaftaran',
+        'nomor_pendaftaran',
+        'catatan',
+        'entry_time'
     ];
 
     protected $hidden = [
         'uid_user',
-        'uid_event',
+        'uid_event_category',
         'created_at',
         'updated_at'
     ];
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'uid_user', 'uid')->select(['id_user', 'uid', 'nama_lengkap', 'foto_profil']);
+        return $this->belongsTo(User::class, 'uid_user', 'uid')
+            ->select([
+                'users.id', 
+                'users.uid', 
+                'users.email', 
+                'data_users.nama_lengkap', 
+                'data_users.foto_profil'
+            ])
+            ->join('data_users', 'users.uid', '=', 'data_users.uid_user');
     }
 
-    public function event()
+    public function eventCategory()
     {
-        return $this->belongsTo(Event::class, 'uid_event', 'uid');
+        return $this->belongsTo(EventCategory::class, 'uid_event_category', 'uid');
     }
 
     public function payment()
     {
-        return $this->belongsTo(Payment::class, 'uid', 'uid_registration');
+        return $this->hasOne(Payment::class, 'uid_registration', 'uid');
+    }
+
+    public function schedule()
+    {
+        return $this->hasOne(Schedule::class, 'uid_registration', 'uid');
     }
 
 

@@ -24,8 +24,8 @@ class Payment extends Model
     protected $fillable = [
         'uid',
         'uid_registration',
-        'total_bayar',
-        'metode_pembayaran',
+        'amount',
+        'payment_method',
         'status_pembayaran',
         'catatan_admin',
         'tanggal_pembayaran',

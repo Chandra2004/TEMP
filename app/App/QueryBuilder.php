@@ -271,7 +271,7 @@ class QueryBuilder
         return $this;
     }
 
-    protected function addSubqueryWhere($type, $relationName, $boolean, Closure $callback = null)
+    protected function addSubqueryWhere($type, $relationName, $boolean, ?Closure $callback = null)
     {
         $relation = $this->model->$relationName();
         $subQuery = $relation->getRelated()->newQueryWithoutScopes();
@@ -293,22 +293,22 @@ class QueryBuilder
         return $this;
     }
 
-    public function whereHas(string $relationName, Closure $callback = null, $boolean = 'AND')
+    public function whereHas(string $relationName, ?Closure $callback = null, $boolean = 'AND')
     {
         return $this->addSubqueryWhere('exists', $relationName, $boolean, $callback);
     }
     
-    public function orWhereHas(string $relationName, Closure $callback = null)
+    public function orWhereHas(string $relationName, ?Closure $callback = null)
     {
         return $this->whereHas($relationName, $callback, 'OR');
     }
 
-    public function doesntHave(string $relation, $boolean = 'AND', Closure $callback = null)
+    public function doesntHave(string $relation, $boolean = 'AND', ?Closure $callback = null)
     {
         return $this->addSubqueryWhere('not_exists', $relation, $boolean, $callback);
     }
 
-    public function orDoesntHave(string $relation, Closure $callback = null)
+    public function orDoesntHave(string $relation, ?Closure $callback = null)
     {
         return $this->doesntHave($relation, 'OR', $callback);
     }
@@ -324,6 +324,11 @@ class QueryBuilder
     {
         $this->joins[] = "{$type} JOIN `{$table}` ON {$first} {$operator} {$second}";
         return $this;
+    }
+
+    public function leftJoin(string $table, string $first, string $operator, string $second)
+    {
+        return $this->join($table, $first, $operator, $second, 'LEFT');
     }
     
     public function orderBy(string $column, string $direction = 'ASC')
@@ -345,7 +350,7 @@ class QueryBuilder
         return $this;
     }
     
-    public function when($value, callable $callback, callable $default = null)
+    public function when($value, callable $callback, ?callable $default = null)
     {
         if ($value) {
             return $callback($this, $value) ?? $this;
@@ -355,7 +360,7 @@ class QueryBuilder
         return $this;
     }
 
-    private function compileWheres(): array
+    private function compileWheres(string $prefix = ''): array
     {
         if (empty($this->wheres)) return ['', []];
 
@@ -369,7 +374,7 @@ class QueryBuilder
 
             switch ($where['type']) {
                 case 'basic':
-                    $paramName = ":where_{$counter}";
+                    $paramName = ":where_{$prefix}{$counter}";
                     $part = "{$this->wrapColumn($where['column'])} {$where['operator']} {$paramName}";
                     $bindings[$paramName] = $where['value'];
                     $counter++;
@@ -380,7 +385,7 @@ class QueryBuilder
                     } else {
                         $inPlaceholders = [];
                         foreach ($where['values'] as $value) {
-                            $inParam = ":in_{$counter}";
+                            $inParam = ":in_{$prefix}{$counter}";
                             $inPlaceholders[] = $inParam;
                             $bindings[$inParam] = $value;
                             $counter++;
@@ -393,12 +398,12 @@ class QueryBuilder
                     $part = "{$this->wrapColumn($where['first'])} {$where['operator']} {$this->wrapColumn($where['second'])}";
                     break;
                 case 'nested':
-                    [$nestedSql, $nestedBindings] = $where['query']->compileWheres();
+                    [$nestedSql, $nestedBindings] = $where['query']->compileWheres($prefix . $counter . "_");
                     $part = "(". ltrim(ltrim($nestedSql, 'WHERE ')) .")";
                     $bindings = array_merge($bindings, $nestedBindings);
                     break;
                 case 'date':
-                    $paramName = ":date_{$counter}";
+                    $paramName = ":date_{$prefix}{$counter}";
                     $part = "{$where['date_type']}({$this->wrapColumn($where['column'])}) {$where['operator']} {$paramName}";
                     $bindings[$paramName] = $where['value'];
                     $counter++;
@@ -411,14 +416,14 @@ class QueryBuilder
                      $bindings = array_merge($bindings, $subBindings);
                     break;
                 case 'json_contains':
-                     $paramName = ":json_{$counter}";
+                     $paramName = ":json_{$prefix}{$counter}";
                      $operator = $where['not'] ? 'NOT ' : '';
                      $part = "{$operator}JSON_CONTAINS({$this->wrapColumn($where['column'])}, {$paramName})";
                      $bindings[$paramName] = json_encode($where['value']);
                      $counter++;
                     break;
                 case 'json_length':
-                    $paramName = ":json_len_{$counter}";
+                    $paramName = ":json_len_{$prefix}{$counter}";
                     $part = "JSON_LENGTH({$this->wrapColumn($where['column'])}) {$where['operator']} {$paramName}";
                     $bindings[$paramName] = $where['value'];
                     $counter++;

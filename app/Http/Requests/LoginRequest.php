@@ -39,21 +39,15 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => 'required|email',
-            'password' => 'required|min:6|confirmed',
+            'email' => 'required|min:3',
+            'password' => 'required|min:6',
         ];
     }
 
-    /**
-     * Get custom labels for validation error messages.
-     * Makes error messages more user-friendly in your language.
-     * 
-     * @return array
-     */
     public function labels(): array
     {
         return [
-            'email' => 'Alamat Email',
+            'email' => 'Email atau Username',
             'password' => 'Kata Sandi',
         ];
     }
