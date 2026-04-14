@@ -17,6 +17,7 @@ class FileController
             'birth_certificates',
             'kode-bank',
             'bukti-pembayaran',
+            'logos',
             'dummy'
             // tambahkan array disini
         ];

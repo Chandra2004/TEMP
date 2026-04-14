@@ -57,8 +57,10 @@
 
     @if ($user->can('manage-events') || $user->can('manage-categories'))
         <div x-data="{ open: {{ request()->is('*/management-category*') ||
+        request()->is('*/management-requirement-parameter*') ||
         request()->is('*/management-event*') ||
         request()->is('*/management-registration*') ||
+        request()->is('*/management-result*') ||
         request()->is('*/management-gallery*')
             ? 'true'
             : 'false' }} }">
@@ -79,6 +81,11 @@
                     class="{{ request()->is('*/management-category') || request()->is('*/management-category/page/*') ? 'text-ksc-blue font-black' : 'text-slate-500 hover:text-ksc-blue font-medium' }} block py-2 text-xs transition text-left">
                     Manajemen Gaya
                 </a>
+                
+                <a href="{{ url('/' . $user->nama_role . '/dashboard/management-requirement-parameter') }}"
+                    class="{{ request()->is('*/management-requirement-parameter') ? 'text-ksc-blue font-black' : 'text-slate-500 hover:text-ksc-blue font-medium' }} block py-2 text-xs transition text-left">
+                    Master Parameter Lomba
+                </a>
                 @endif 
                
                 
@@ -90,6 +97,10 @@
                 <a href="{{ url('/' . $user->nama_role . '/dashboard/management-registration') }}"
                     class="{{ request()->is('*/management-registration') ? 'text-ksc-blue font-black' : 'text-slate-500 hover:text-ksc-blue font-medium' }} block py-2 text-xs transition text-left">
                     Manajemen Pendaftaran
+                </a>
+                <a href="{{ url('/' . $user->nama_role . '/dashboard/management-result') }}"
+                    class="{{ request()->is('*/management-result*') ? 'text-ksc-blue font-black' : 'text-slate-500 hover:text-ksc-blue font-medium' }} block py-2 text-xs transition text-left">
+                    Manajemen Hasil Lomba
                 </a>
                 @endif
                 

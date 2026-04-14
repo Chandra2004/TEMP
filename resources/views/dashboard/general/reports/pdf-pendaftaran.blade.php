@@ -84,40 +84,50 @@
 </head>
 <body>
     @php
-        $logoPath = $_SERVER['DOCUMENT_ROOT'] . '/public/assets/ico/icon-bar.png';
-        if (file_exists($logoPath)) {
-            $logoData = base64_encode(file_get_contents($logoPath));
-            $logoSrc = 'data:image/png;base64,' . $logoData;
-        } else {
-            $logoSrc = '';
+        $pathKiri = (isset($event) && $event['logo_kiri']) ? ROOT_DIR . '/private-uploads/logos/' . $event['logo_kiri'] : $_SERVER['DOCUMENT_ROOT'] . '/public/assets/ico/icon-bar.png';
+        $pathKanan = (isset($event) && $event['logo_kanan']) ? ROOT_DIR . '/private-uploads/logos/' . $event['logo_kanan'] : $_SERVER['DOCUMENT_ROOT'] . '/public/assets/ico/logo.png';
+
+        $logoSrcKiri = '';
+        if (file_exists($pathKiri)) {
+            $logoDataKiri = base64_encode(file_get_contents($pathKiri));
+            $mimeKiri = mime_content_type($pathKiri);
+            $logoSrcKiri = 'data:' . $mimeKiri . ';base64,' . $logoDataKiri;
+        }
+
+        $logoSrcKanan = '';
+        if (file_exists($pathKanan)) {
+            $logoDataKanan = base64_encode(file_get_contents($pathKanan));
+            $mimeKanan = mime_content_type($pathKanan);
+            $logoSrcKanan = 'data:' . $mimeKanan . ';base64,' . $logoDataKanan;
         }
     @endphp
 
     <div class="header">
-        <table>
+        <table style="border-collapse: collapse;">
             <tr>
-                <td class="logo">
-                    @if($logoSrc)
-                        <img src="{{ $logoSrc }}" style="max-height: 60px;">
+                <td class="logo" width="100">
+                    @if($logoSrcKiri)
+                        <img src="{{ $logoSrcKiri }}" style="max-height: 80px; max-width: 100px;">
                     @endif
                 </td>
-                <td class="event-info">
-                    @if($event)
-                        <h1>{{ $event['nama_event'] }}</h1>
-                        <p>{{ $event['lokasi_event'] }}</p>
-                        <p>{{ date('d F Y', strtotime($event['tanggal_mulai'])) }}</p>
+                <td class="event-info text-center">
+                    @if(isset($event))
+                        <h1 style="font-size: 20px; color: #1e293b; margin: 0;">{{ $event['nama_event'] }}</h1>
+                        <p style="margin: 3px 0; font-size: 13px; color: #64748b;">{{ $event['lokasi_event'] }}</p>
+                        <p style="margin: 3px 0; font-weight: bold; color: #334155;">{{ \Carbon\Carbon::parse($event['tanggal_mulai'])->translatedFormat('d F Y') }}</p>
                     @else
-                        <h1>KHAFID SWIMMING CLUB (KSC)</h1>
-                        <p>LAPORAN PENDAFTARAN GLOBAL</p>
+                        <h1 style="font-size: 20px; color: #1e293b; margin: 0;">KHAFID SWIMMING CLUB (KSC)</h1>
+                        <p style="margin: 3px 0; font-size: 13px; color: #64748b;">LAPORAN PENDAFTARAN GLOBAL</p>
                     @endif
                 </td>
-                <td class="logo" style="text-align: right;">
-                    @if($logoSrc)
-                        <img src="{{ $logoSrc }}" style="max-height: 60px;">
+                <td class="logo text-right" width="100">
+                    @if($logoSrcKanan)
+                        <img src="{{ $logoSrcKanan }}" style="max-height: 80px; max-width: 100px;">
                     @endif
                 </td>
             </tr>
         </table>
+        <div style="height: 5px; border-bottom: 3px double #000; margin-top: 10px;"></div>
     </div>
 
     <div class="report-title">REKAPITULASI PENDAFTARAN ATLET</div>

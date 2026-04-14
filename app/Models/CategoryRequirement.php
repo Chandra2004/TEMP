@@ -22,6 +22,11 @@ class CategoryRequirement extends Model
         'notes'
     ];
 
+    protected $casts = [
+        'parameter_value' => 'json',
+        'is_required' => 'boolean'
+    ];
+
     public function eventCategory()
     {
         return $this->belongsTo(EventCategory::class, 'uid_event_category', 'uid');

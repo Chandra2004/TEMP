@@ -10,6 +10,7 @@ use TheFramework\Models\Event;
 use TheFramework\Models\EventCategory;
 use TheFramework\Models\PaymentMethod;
 use TheFramework\Models\User;
+use TheFramework\Models\Result;
 use TheFramework\Http\Controllers\Services\ErrorController;
 
 class EventController extends Controller
@@ -32,6 +33,43 @@ class EventController extends Controller
         }
 
         $events = Event::with(['eventCategories', 'eventCategories.requirements'])->paginate(10, $page);
+        $requirementParameters = \TheFramework\Models\RequirementParameter::query()->all();
+
+        // Transform data untuk memudahkan View (Modal Edit)
+        $events['data'] = array_map(function ($event) use ($requirementParameters) {
+            $event['matches_data'] = array_map(function ($cat) use ($requirementParameters) {
+                $formattedRequirements = array_map(function ($req) use ($requirementParameters) {
+                    $paramMetadata = null;
+                    foreach ($requirementParameters as $p) {
+                        if ($p['parameter_key'] === $req['parameter_name']) {
+                            $paramMetadata = $p;
+                            break;
+                        }
+                    }
+                    return [
+                        'parameter_name' => $req['parameter_name'],
+                        'operator' => $req['operator'],
+                        'parameter_value' => $req['parameter_value'],
+                        'input_type' => $paramMetadata['input_type'] ?? 'text',
+                        'options' => json_decode($paramMetadata['input_options'] ?? '[]', true),
+                        'allowed_operators' => json_decode($paramMetadata['allowed_operators'] ?? '[]', true)
+                    ];
+                }, $cat['requirements'] ?? []);
+
+                return [
+                    'uid_category' => $cat['uid_category'],
+                    'nomor_acara' => $cat['nomor_acara'] ?? '',
+                    'nama_acara' => $cat['nama_acara'],
+                    'tipe_biaya' => $cat['tipe_biaya'],
+                    'biaya_pendaftaran' => $cat['biaya_pendaftaran'],
+                    'jumlah_seri' => $cat['jumlah_seri'],
+                    'waktu_mulai' => $cat['waktu_mulai'] ?? '08:00',
+                    'requirements' => $formattedRequirements
+                ];
+            }, $event['eventCategories'] ?? []);
+
+            return $event;
+        }, $events['data']);
         $categories = \TheFramework\Models\Category::query()->all();
         $authors = User::query()
             ->select(['users.*', 'roles.name as nama_role', 'data_users.nama_lengkap'])
@@ -62,12 +100,17 @@ class EventController extends Controller
             return Helper::redirect('/logout', 'error', 'Sesi tidak valid, silakan login kembali.', 3);
         }
 
+        $requirementParameters = \TheFramework\Models\RequirementParameter::query()
+            ->where('is_active', '=', 1)
+            ->all();
+
         return View::render('dashboard.general.event', [
             'user' => $user,
             'events' => $events,
             'categories' => $categories,
             'authors' => $authors,
             'payment_methods' => $paymentMethods,
+            'requirement_parameters' => $requirementParameters,
             'totalUnreadNotification' => $totalUnreadNotification,
             'unReadNotification' => $unReadNotification,
             'notification' => Helper::get_flash('notification'),
@@ -90,12 +133,30 @@ class EventController extends Controller
                 }
             }
 
+            $logoKiri = null;
+            if ($request->hasFile('logo_kiri')) {
+                $logoKiri = UploadHandler::handleUploadToWebP($request->file('logo_kiri'), '/logos', 'logo_kiri_');
+                if (UploadHandler::isError($logoKiri)) {
+                    throw new \Exception(UploadHandler::getErrorMessage($logoKiri));
+                }
+            }
+
+            $logoKanan = null;
+            if ($request->hasFile('logo_kanan')) {
+                $logoKanan = UploadHandler::handleUploadToWebP($request->file('logo_kanan'), '/logos', 'logo_kanan_');
+                if (UploadHandler::isError($logoKanan)) {
+                    throw new \Exception(UploadHandler::getErrorMessage($logoKanan));
+                }
+            }
+
             $data = $request->validated();
             $data['uid'] = Helper::uuid();
             $data['slug'] = Helper::slugify($data['nama_event']);
             $data['banner_event'] = $newPhoto;
+            $data['logo_kiri'] = $logoKiri;
+            $data['logo_kanan'] = $logoKanan;
 
-            $matches = $data['matches'] ?? [];
+            $matches = $request->all()['matches'] ?? [];
             unset($data['matches']);
 
             // Manual Validation for Matches
@@ -115,12 +176,13 @@ class EventController extends Controller
 
             $eventCreated = Event::query()->insert($data);
             if ($eventCreated) {
-                foreach ($matches as $match) {
+                foreach ($matches as $idx => $match) {
                     $matchUid = Helper::uuid();
                     EventCategory::query()->insert([
                         'uid' => $matchUid,
                         'uid_event' => $data['uid'],
                         'uid_category' => $match['uid_category'],
+                        'nomor_acara' => $idx + 1,
                         'nama_acara' => $match['nama_acara'] ?? '',
                         'tipe_biaya' => $match['tipe_biaya'] ?? 'gratis',
                         'biaya_pendaftaran' => ($match['tipe_biaya'] ?? '') == 'berbayar' ? ($match['biaya_pendaftaran'] ?? 0) : 0,
@@ -135,7 +197,7 @@ class EventController extends Controller
                                     'uid' => Helper::uuid(),
                                     'uid_event_category' => $matchUid,
                                     'parameter_name' => $req['parameter_name'],
-                                    'parameter_value' => $req['parameter_value'] ?? '',
+                                    'parameter_value' => json_encode($req['parameter_value'] ?? ''),
                                     'operator' => $req['operator'] ?? '=',
                                     'parameter_type' => 'string',
                                     'is_required' => 1
@@ -184,7 +246,33 @@ class EventController extends Controller
                 $data['banner_event'] = $eventRecord['banner_event'];
             }
 
-            $matches = $data['matches'] ?? [];
+            if ($request->hasFile('logo_kiri')) {
+                $logoKiriNew = UploadHandler::handleUploadToWebP($request->file('logo_kiri'), '/logos', 'logo_kiri_');
+                if (UploadHandler::isError($logoKiriNew)) {
+                    throw new \Exception(UploadHandler::getErrorMessage($logoKiriNew));
+                }
+                if ($eventRecord['logo_kiri']) {
+                    UploadHandler::delete($eventRecord['logo_kiri'], '/logos');
+                }
+                $data['logo_kiri'] = $logoKiriNew;
+            } else {
+                $data['logo_kiri'] = $eventRecord['logo_kiri'];
+            }
+
+            if ($request->hasFile('logo_kanan')) {
+                $logoKananNew = UploadHandler::handleUploadToWebP($request->file('logo_kanan'), '/logos', 'logo_kanan_');
+                if (UploadHandler::isError($logoKananNew)) {
+                    throw new \Exception(UploadHandler::getErrorMessage($logoKananNew));
+                }
+                if ($eventRecord['logo_kanan']) {
+                    UploadHandler::delete($eventRecord['logo_kanan'], '/logos');
+                }
+                $data['logo_kanan'] = $logoKananNew;
+            } else {
+                $data['logo_kanan'] = $eventRecord['logo_kanan'];
+            }
+
+            $matches = $request->all()['matches'] ?? [];
             unset($data['matches']);
 
             // Manual Validation for Matches
@@ -215,12 +303,13 @@ class EventController extends Controller
                 EventCategory::query()->where('uid', '=', $exMatch['uid'])->delete();
             }
 
-            foreach ($matches as $match) {
+            foreach ($matches as $idx => $match) {
                 $matchUid = Helper::uuid();
                 EventCategory::query()->insert([
                     'uid' => $matchUid,
                     'uid_event' => $uidEvent,
                     'uid_category' => $match['uid_category'],
+                    'nomor_acara' => $idx + 1,
                     'nama_acara' => $match['nama_acara'] ?? '',
                     'tipe_biaya' => $match['tipe_biaya'] ?? 'gratis',
                     'biaya_pendaftaran' => ($match['tipe_biaya'] ?? '') == 'berbayar' ? ($match['biaya_pendaftaran'] ?? 0) : 0,
@@ -235,7 +324,7 @@ class EventController extends Controller
                                 'uid' => Helper::uuid(),
                                 'uid_event_category' => $matchUid,
                                 'parameter_name' => $req['parameter_name'],
-                                'parameter_value' => $req['parameter_value'] ?? '',
+                                'parameter_value' => json_encode($req['parameter_value'] ?? ''),
                                 'operator' => $req['operator'] ?? '=',
                                 'parameter_type' => 'string',
                                 'is_required' => 1
@@ -310,9 +399,9 @@ class EventController extends Controller
             foreach ($eventCategories as $ec) {
                 $acaraItem = [
                     'nomor_acara' => $ec['nomor_acara'],
-                    'nama_acara'  => $ec['nama_acara'],
-                    'kode_ku'     => $ec['category']['kode_ku'] ?? 'UMUM',
-                    'seri'        => []
+                    'nama_acara' => $ec['nama_acara'],
+                    'kode_ku' => $ec['category']['kode_ku'] ?? 'UMUM',
+                    'seri' => []
                 ];
 
                 $registrationsRaw = \TheFramework\Models\Registration::query()
@@ -340,7 +429,7 @@ class EventController extends Controller
                 foreach ($registrationsRaw as $reg) {
                     // Kunci unik: gabungan UID User dan Nama (antisipasi data kembar)
                     $athleteKey = $reg['uid_user'] . '-' . strtolower(trim($reg['nama_lengkap']));
-                    
+
                     if (!isset($uniqueAthletes[$athleteKey])) {
                         $uniqueAthletes[$athleteKey] = true;
                         $registrations[] = $reg;
@@ -352,6 +441,39 @@ class EventController extends Controller
                     if (!isset($acaraItem['seri'][$seriNum])) {
                         $acaraItem['seri'][$seriNum] = [];
                     }
+
+                    // Tambahkan komentar penjelas
+                    // Ambil Waktu Terbaik (Prestasi) dari database (Hanya dari lomba yang TANGGALNYA SEBELUM event ini)
+                    $bestTime = Result::getBestTime($reg['uid_user'], $ec['uid_category'], $e['tanggal_mulai']);
+                    
+                    // Prioritas:
+                    // 1. Waktu terbaik dari lomba sebelumnya di database
+                    // 2. Jika tidak ada, gunakan seed_time pendaftaran (jika berupa waktu valid)
+                    // 3. Jika tidak ada semua, tampilkan "NT"
+                    if ($bestTime !== 'NT') {
+                        $reg['prestasi'] = $bestTime;
+                    } else {
+                        // Cek apakah seed_time berisi format waktu (ada tanda : atau .)
+                        // Jika isinya teks lain seperti nama kategori, kita paksa jadi NT
+                        $isTime = preg_match('/[0-9]/', $reg['seed_time'] ?? '') && (str_contains($reg['seed_time'], ':') || str_contains($reg['seed_time'], '.'));
+                        $reg['prestasi'] = $isTime ? $reg['seed_time'] : 'NT';
+                    }
+                    
+                    // Ambil Hasil lomba saat ini (jika sudah diinput admin)
+                    $currentResult = Result::query()
+                        ->where('uid_registration', '=', $reg['uid'])
+                        ->first();
+                    
+                    if ($currentResult) {
+                        if ($currentResult['status'] === 'FINISH') {
+                            $reg['hasil'] = $currentResult['waktu_akhir'];
+                        } else {
+                            $reg['hasil'] = $currentResult['status']; // NS atau DSQ
+                        }
+                    } else {
+                        $reg['hasil'] = ''; // Belum ada hasil
+                    }
+
                     $acaraItem['seri'][$seriNum][] = $reg;
                 }
                 $dataAcara[] = $acaraItem;
@@ -374,6 +496,77 @@ class EventController extends Controller
         $dompdf->render();
 
         $filename = 'Buku_Acara_' . date('Y-m-d_His') . '.pdf';
+        $dompdf->stream($filename, ["Attachment" => true]);
+        exit;
+    }
+
+    public function exportBukuHasil($role, $uidUser, $uidEvent)
+    {
+        $eventFound = Event::where('uid', $uidEvent)->first();
+        if (!$eventFound) {
+            return Helper::redirect(Helper::previous(), 'error', 'Event tidak ditemukan.');
+        }
+
+        $eventCategories = \TheFramework\Models\EventCategory::query()
+            ->with(['category'])
+            ->where('uid_event', '=', $uidEvent)
+            ->orderBy('nomor_acara', 'ASC')
+            ->all();
+
+        $globalData = [];
+        foreach ($eventCategories as $ec) {
+            $results = Result::query()
+                ->select([
+                    'results.*',
+                    'data_users.nama_lengkap',
+                    'data_users.klub_renang',
+                    'data_users.sekolah',
+                    'registrations.nomor_pendaftaran'
+                ])
+                ->join('registrations', 'results.uid_registration', '=', 'registrations.uid')
+                ->join('users', 'registrations.uid_user', '=', 'users.uid')
+                ->join('data_users', 'users.uid', '=', 'data_users.uid_user')
+                ->where('registrations.uid_event_category', '=', $ec['uid'])
+                ->where('results.status', '=', 'FINISH')
+                ->where('results.total_milliseconds', '>', 0)
+                ->orderBy('results.total_milliseconds', 'ASC')
+                ->all();
+
+            // Tambahkan juga yang NS/DSQ di akhir (opsional)
+            $nonFinishers = Result::query()
+                ->select([
+                    'results.*',
+                    'data_users.nama_lengkap',
+                    'data_users.klub_renang',
+                    'data_users.sekolah',
+                    'registrations.nomor_pendaftaran'
+                ])
+                ->join('registrations', 'results.uid_registration', '=', 'registrations.uid')
+                ->join('users', 'registrations.uid_user', '=', 'users.uid')
+                ->join('data_users', 'users.uid', '=', 'data_users.uid_user')
+                ->where('registrations.uid_event_category', '=', $ec['uid'])
+                ->where('results.status', '!=', 'FINISH')
+                ->all();
+
+            $globalData[] = [
+                'acara' => $ec,
+                'results' => array_merge($results, $nonFinishers)
+            ];
+        }
+
+        $html = View::renderToString('dashboard.general.reports.buku-hasil', [
+            'event' => $eventFound,
+            'globalData' => $globalData,
+            'title' => 'Buku Hasil - ' . $eventFound['nama_event']
+        ]);
+
+        $dompdf = new \Dompdf\Dompdf();
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->set_option('isRemoteEnabled', true);
+        $dompdf->loadHtml($html);
+        $dompdf->render();
+
+        $filename = 'Buku_Hasil_' . str_replace(' ', '_', $eventFound['nama_event']) . '_' . date('His') . '.pdf';
         $dompdf->stream($filename, ["Attachment" => true]);
         exit;
     }

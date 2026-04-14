@@ -25,6 +25,8 @@ use TheFramework\Http\Controllers\MyProfileController;
 use TheFramework\Http\Controllers\NotificationController;
 use TheFramework\Http\Controllers\PaymentMethodController;
 use TheFramework\Http\Controllers\RegistrationController;
+use TheFramework\Http\Controllers\RequirementParameterController;
+use TheFramework\Http\Controllers\EventResultController;
 use TheFramework\Http\Controllers\UserController;
 
 // COMING SOON
@@ -140,10 +142,23 @@ Router::group([
     Router::add('POST', '/{uidUser}/dashboard/notifications/{uidNotification}/edit/process', NotificationController::class, 'notificationEditProcess', [[PermissionMiddleware::class, 'view-dashboard']]);
     Router::add('POST', '/{uidUser}/dashboard/notifications/{uidNotification}/delete/process', NotificationController::class, 'notificationDeleteProcess', [[PermissionMiddleware::class, 'view-dashboard']]);
 
+    // REQUIREMENT PARAMETER MANAGEMENT
+    Router::add('GET', '/dashboard/management-requirement-parameter', RequirementParameterController::class, 'index', [[PermissionMiddleware::class, 'manage-users']]);
+    Router::add('POST', '/{uidUser}/dashboard/management-requirement-parameter/create/process', RequirementParameterController::class, 'createProcess', [[PermissionMiddleware::class, 'manage-users']]);
+    Router::add('POST', '/{uidUser}/{uidParam}/dashboard/management-requirement-parameter/edit/process', RequirementParameterController::class, 'editProcess', [[PermissionMiddleware::class, 'manage-users']]);
+    Router::add('POST', '/{uidUser}/{uidParam}/dashboard/management-requirement-parameter/delete/process', RequirementParameterController::class, 'deleteProcess', [[PermissionMiddleware::class, 'manage-users']]);
+
+    // RESULT MANAGEMENT
+    Router::add('GET', '/dashboard/management-result', EventResultController::class, 'index', [[PermissionMiddleware::class, 'manage-events']]);
+    Router::add('GET', '/dashboard/management-result/{uidEvent}/categories', EventResultController::class, 'categoryList', [[PermissionMiddleware::class, 'manage-events']]);
+    Router::add('GET', '/dashboard/management-result/{uidEvent}/input/{uidEventCategory}', EventResultController::class, 'inputForm', [[PermissionMiddleware::class, 'manage-events']]);
+    Router::add('POST', '/dashboard/management-result/{uidEvent}/input/{uidEventCategory}/process', EventResultController::class, 'store', [[PermissionMiddleware::class, 'manage-events']]);
+
     // REPORT
     Router::add('GET', '/dashboard/export-reports', DashboardController::class, 'report', [[PermissionMiddleware::class, 'view-reports']]);
     Router::add('GET', '/dashboard/export-reports/process', DashboardController::class, 'exportProcess', [[PermissionMiddleware::class, 'view-reports']]);
     Router::add('GET', '/dashboard/management-event/{uidEvent}/export-buku-acara', EventController::class, 'exportBukuAcara', [[PermissionMiddleware::class, 'view-reports']]);
+    Router::add('GET', '/dashboard/management-event/{uidEvent}/export-buku-hasil', EventController::class, 'exportBukuHasil', [[PermissionMiddleware::class, 'view-reports']]);
 
     // MY PROFILE
     Router::add('GET', '/dashboard/my-profile', MyProfileController::class, 'myProfile', [[PermissionMiddleware::class, 'view-dashboard']]);

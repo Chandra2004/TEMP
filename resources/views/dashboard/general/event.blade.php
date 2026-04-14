@@ -7,12 +7,14 @@
                 <h2 class="text-2xl font-bold text-slate-900 leading-tight">Manajemen Event</h2>
                 <p class="text-sm text-slate-500">Atur jadwal, lokasi, dan biaya event mendatang</p>
             </div>
-            <button data-modal-target="modal-tambah-event" data-modal-toggle="modal-tambah-event"
-                class="flex items-center gap-2 bg-ksc-blue hover:bg-ksc-dark text-white px-4 py-2.5 rounded-lg font-semibold transition shadow-sm focus:ring-4 focus:ring-blue-300"
-                type="button">
-                <i data-lucide="calendar-plus" class="w-5 h-5"></i>
-                <span>Tambah Event</span>
-            </button>
+            @if ($user->can('manage-events'))
+                <button data-modal-target="modal-tambah-event" data-modal-toggle="modal-tambah-event"
+                    class="flex items-center gap-2 bg-ksc-blue hover:bg-ksc-dark text-white px-4 py-2.5 rounded-lg font-semibold transition shadow-sm focus:ring-4 focus:ring-blue-300"
+                    type="button">
+                    <i data-lucide="calendar-plus" class="w-5 h-5"></i>
+                    <span>Tambah Event</span>
+                </button>
+            @endif
         </div>
 
         <div class="bg-white rounded-3xl border border-slate-100 shadow-xl shadow-slate-200/50 overflow-hidden">
@@ -24,7 +26,9 @@
                             <th scope="col" class="px-6 py-4 font-black text-[10px] text-slate-400 uppercase tracking-widest">Dates</th>
                             <th scope="col" class="px-6 py-4 font-black text-[10px] text-slate-400 uppercase tracking-widest text-center">Lanes</th>
                             <th scope="col" class="px-6 py-4 font-black text-[10px] text-slate-400 uppercase tracking-widest text-center">Status</th>
+                            @if($user->can('manage-events') || $user->can('view-reports'))
                             <th scope="col" class="px-6 py-4 font-black text-[10px] text-slate-400 uppercase tracking-widest text-center">Actions</th>
+                            @endif
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-50">
@@ -74,22 +78,38 @@
                                 </td>
                                 <td class="px-6 py-5">
                                     <div class="flex items-center justify-center gap-2">
-                                        <a href="{{ url('/' . $user['nama_role'] . '/dashboard/management-event/' . $event['uid'] . '/export-buku-acara') }}"
-                                            target="_blank"
-                                            class="p-2 bg-emerald-50 text-emerald-600 rounded-xl hover:bg-emerald-600 hover:text-white transition shadow-sm active:scale-90"
-                                            title="Export Buku Acara">
-                                            <i data-lucide="printer" class="w-4 h-4"></i>
-                                        </a>
-                                        <button data-modal-target="modal-edit-event-{{ $event['uid'] }}"
-                                            data-modal-toggle="modal-edit-event-{{ $event['uid'] }}"
-                                            class="p-2 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-600 hover:text-white transition shadow-sm active:scale-90">
-                                            <i data-lucide="edit-3" class="w-4 h-4"></i>
-                                        </button>
-                                        <button data-modal-target="modal-hapus-event-{{ $event['uid'] }}"
-                                            data-modal-toggle="modal-hapus-event-{{ $event['uid'] }}"
-                                            class="p-2 bg-rose-50 text-rose-600 rounded-xl hover:bg-rose-600 hover:text-white transition shadow-sm active:scale-90">
-                                            <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                        </button>
+                                        @if ($user->can('view-reports'))
+                                            <a href="{{ url('/' . $user['nama_role'] . '/dashboard/management-event/' . $event['uid'] . '/export-buku-acara') }}"
+                                                target="_blank"
+                                                class="p-2 bg-emerald-50 text-emerald-600 rounded-xl hover:bg-emerald-600 hover:text-white transition shadow-sm active:scale-90"
+                                                title="Export Buku Acara">
+                                                <i data-lucide="printer" class="w-4 h-4"></i>
+                                            </a>
+                                            <a href="{{ url('/' . $user['nama_role'] . '/dashboard/management-event/' . $event['uid'] . '/export-buku-hasil') }}"
+                                                target="_blank"
+                                                class="p-2 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-600 hover:text-white transition shadow-sm active:scale-90"
+                                                title="Export Buku Hasil">
+                                                <i data-lucide="award" class="w-4 h-4"></i>
+                                            </a>
+                                        @endif
+
+                                        @if ($user->can('manage-events'))
+                                            <button data-modal-target="modal-edit-event-{{ $event['uid'] }}"
+                                                data-modal-toggle="modal-edit-event-{{ $event['uid'] }}"
+                                                class="p-2 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-600 hover:text-white transition shadow-sm active:scale-90">
+                                                <i data-lucide="edit-3" class="w-4 h-4"></i>
+                                            </button>
+                                            <button data-modal-target="modal-hapus-event-{{ $event['uid'] }}"
+                                                data-modal-toggle="modal-hapus-event-{{ $event['uid'] }}"
+                                                class="p-2 bg-rose-50 text-rose-600 rounded-xl hover:bg-rose-600 hover:text-white transition shadow-sm active:scale-90">
+                                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                            </button>
+                                        @else
+                                            <a href="{{ url('/detail-event/' . $event['slug'] . '/' . $event['uid']) }}" 
+                                                class="px-4 py-1.5 bg-ksc-blue text-white rounded-lg text-xs font-bold hover:bg-ksc-dark transition shadow-sm shadow-blue-200">
+                                                Detail & Daftar
+                                            </a>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>
@@ -144,6 +164,7 @@
         </div>
     </div>
 
+    @if ($user->can('manage-events'))
     <div id="modal-tambah-event" tabindex="-1" aria-hidden="true"
         class="hidden fixed top-0 left-0 right-0 z-[70] w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-full max-h-full items-center justify-center bg-slate-900/60 backdrop-blur-sm transition-opacity">
         <div class="relative w-full max-w-4xl max-h-full">
@@ -167,6 +188,7 @@
                     method="POST" enctype="multipart/form-data" x-data="{
                         tipe: 'berbayar',
                         categories: {{ json_encode($categories) }},
+                        master_params: {{ json_encode($requirement_parameters) }},
                         matches: [{
                             uid_category: '',
                             nama_acara: '',
@@ -200,39 +222,80 @@
                             this.matches[matchIndex].requirements.push({
                                 parameter_name: '',
                                 operator: '=',
-                                parameter_value: ''
+                                parameter_value: '',
+                                input_type: 'text',
+                                options: []
                             });
                         },
                         removeRequirement(matchIndex, reqIndex) {
                             this.matches[matchIndex].requirements.splice(reqIndex, 1);
+                        },
+                        onParamChange(mIdx, rIdx) {
+                            const pName = this.matches[mIdx].requirements[rIdx].parameter_name;
+                            const param = this.master_params.find(p => p.parameter_key === pName);
+                            if (param) {
+                                this.matches[mIdx].requirements[rIdx].input_type = param.input_type;
+                                this.matches[mIdx].requirements[rIdx].options = JSON.parse(param.input_options || '[]');
+                                this.matches[mIdx].requirements[rIdx].allowed_operators = JSON.parse(param.allowed_operators || '[]');
+                                // Reset operator if current one not allowed
+                                if (!this.matches[mIdx].requirements[rIdx].allowed_operators.includes(this.matches[mIdx].requirements[rIdx].operator)) {
+                                    this.matches[mIdx].requirements[rIdx].operator = this.matches[mIdx].requirements[rIdx].allowed_operators[0] || '=';
+                                }
+                            }
                         }
                     }">
                     @csrf
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
                         <div class="md:col-span-2">
-                            <label class="block mb-2 text-sm font-bold text-slate-700 uppercase tracking-wider">Banner
-                                Event</label>
+                            <label class="block mb-2 text-sm font-bold text-slate-700 uppercase tracking-wider">Banner Event</label>
                             <div class="flex items-center justify-center w-full">
                                 <label for="banner-upload"
                                     class="flex flex-col items-center justify-center w-full h-52 border-2 border-slate-300 border-dashed rounded-2xl cursor-pointer bg-slate-50 hover:bg-slate-100 transition relative overflow-hidden group">
                                     <div id="preview-container-create" class="absolute inset-0 hidden">
                                         <img id="banner-preview-create" src="#" alt="Preview"
                                             class="w-full h-full object-cover">
-                                        <div
-                                            class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
-                                            <p class="text-white text-xs font-bold uppercase tracking-widest">Ganti Gambar
-                                            </p>
+                                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
+                                            <p class="text-white text-xs font-bold uppercase tracking-widest">Ganti Gambar</p>
                                         </div>
                                     </div>
-                                    <div id="placeholder-content-create"
-                                        class="flex flex-col items-center justify-center pt-5 pb-6">
+                                    <div id="placeholder-content-create" class="flex flex-col items-center justify-center pt-5 pb-6">
                                         <i data-lucide="image-plus" class="w-10 h-10 text-slate-400 mb-3"></i>
                                         <p class="mb-2 text-sm text-slate-500 font-bold">Klik untuk unggah poster event</p>
-                                        <p class="text-[10px] text-slate-400 uppercase font-medium">Format: WEBP, PNG, JPG
-                                            (Maks. 2MB)</p>
+                                        <p class="text-[10px] text-slate-400 uppercase font-medium">Format: WEBP, PNG, JPG (Maks. 2MB)</p>
                                     </div>
-                                    <input id="banner-upload" name="banner_event" type="file" class="hidden"
-                                        accept="image/*" onchange="previewBannerCreate(this)" />
+                                    <input id="banner-upload" name="banner_event" type="file" class="hidden" accept="image/*" onchange="previewBannerCreate(this)" />
+                                </label>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block mb-2 text-sm font-bold text-slate-700 uppercase tracking-wider">Logo Kiri (Header Report)</label>
+                            <div class="flex items-center justify-center w-full">
+                                <label for="logo-kiri-upload" class="flex flex-col items-center justify-center w-full h-32 border-2 border-slate-300 border-dashed rounded-2xl cursor-pointer bg-slate-50 hover:bg-slate-100 transition relative overflow-hidden group">
+                                    <div id="preview-logo-kiri-create" class="absolute inset-0 hidden">
+                                        <img id="logo-kiri-preview-img" src="#" alt="Preview" class="w-full h-full object-contain p-2">
+                                    </div>
+                                    <div id="placeholder-logo-kiri-create" class="flex flex-col items-center justify-center">
+                                        <i data-lucide="image" class="w-6 h-6 text-slate-400 mb-1"></i>
+                                        <p class="text-[10px] text-slate-500 font-bold uppercase">Unggah Logo</p>
+                                    </div>
+                                    <input id="logo-kiri-upload" name="logo_kiri" type="file" class="hidden" accept="image/*" onchange="previewLogo(this, 'logo-kiri-preview-img', 'preview-logo-kiri-create', 'placeholder-logo-kiri-create')" />
+                                </label>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block mb-2 text-sm font-bold text-slate-700 uppercase tracking-wider">Logo Kanan (Header Report)</label>
+                            <div class="flex items-center justify-center w-full">
+                                <label for="logo-kanan-upload" class="flex flex-col items-center justify-center w-full h-32 border-2 border-slate-300 border-dashed rounded-2xl cursor-pointer bg-slate-50 hover:bg-slate-100 transition relative overflow-hidden group">
+                                    <div id="preview-logo-kanan-create" class="absolute inset-0 hidden">
+                                        <img id="logo-kanan-preview-img" src="#" alt="Preview" class="w-full h-full object-contain p-2">
+                                    </div>
+                                    <div id="placeholder-logo-kanan-create" class="flex flex-col items-center justify-center">
+                                        <i data-lucide="image" class="w-6 h-6 text-slate-400 mb-1"></i>
+                                        <p class="text-[10px] text-slate-500 font-bold uppercase">Unggah Logo</p>
+                                    </div>
+                                    <input id="logo-kanan-upload" name="logo_kanan" type="file" class="hidden" accept="image/*" onchange="previewLogo(this, 'logo-kanan-preview-img', 'preview-logo-kanan-create', 'placeholder-logo-kanan-create')" />
                                 </label>
                             </div>
                         </div>
@@ -407,13 +470,12 @@
                                                                     :name="'matches[' + index + '][requirements][' + reqIndex +
                                                                         '][parameter_name]'"
                                                                     x-model="req.parameter_name"
-                                                                    class="w-full text-xs font-bold px-3 py-2 bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-100 outline-none transition">
+                                                                    @change="onParamChange(index, reqIndex)"
+                                                                    class="w-full text-xs font-bold px-3 py-2 bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-100 outline-none transition uppercase">
                                                                     <option value="">Pilih Parameter</option>
-                                                                    <option value="gender">Jenis Kelamin</option>
-                                                                    <option value="birth_year">Tahun Lahir</option>
-                                                                    <option value="age_min">Umur Minimal</option>
-                                                                    <option value="age_max">Umur Maksimal</option>
-                                                                    <option value="club_only">Khusus Klub</option>
+                                                                    <template x-for="p in master_params" :key="p.uid">
+                                                                        <option :value="p.parameter_key" x-text="p.display_name"></option>
+                                                                    </template>
                                                                 </select>
                                                             </div>
                                                             <div class="md:col-span-2">
@@ -424,24 +486,36 @@
                                                                         '][operator]'"
                                                                     x-model="req.operator"
                                                                     class="w-full text-xs font-bold px-3 py-2 bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-100 outline-none transition">
-                                                                    <option value="="> = </option>
-                                                                    <option value=">"> > </option>
-                                                                    <option value="<"> < </option>
-                                                                    <option value=">="> >= </option>
-                                                                    <option value="<="> <= </option>
-                                                                    <option value="IN"> DI DALAM </option>
+                                                                    <template x-for="op in req.allowed_operators" :key="op">
+                                                                        <option :value="op" x-text="op"></option>
+                                                                    </template>
                                                                 </select>
                                                             </div>
                                                             <div class="md:col-span-5">
                                                                 <label
                                                                     class="block mb-1 text-[9px] font-black text-slate-400 uppercase">Nilai
                                                                     Syarat</label>
-                                                                <input type="text"
-                                                                    :name="'matches[' + index + '][requirements][' + reqIndex +
-                                                                        '][parameter_value]'"
-                                                                    x-model="req.parameter_value"
-                                                                    placeholder="Contoh: Putra / 2017 / KSC"
-                                                                    class="w-full text-xs font-bold px-3 py-2 bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-100 outline-none transition">
+                                                                <!-- Text / Number / Date -->
+                                                                <template x-if="req.input_type !== 'select'">
+                                                                    <input :type="req.input_type || 'text'"
+                                                                        :name="'matches[' + index + '][requirements][' + reqIndex +
+                                                                            '][parameter_value]'"
+                                                                        x-model="req.parameter_value"
+                                                                        class="w-full text-xs font-bold px-3 py-2 bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-100 outline-none transition">
+                                                                </template>
+                                                                <!-- Select Dropdown -->
+                                                                <template x-if="req.input_type === 'select'">
+                                                                    <select
+                                                                        :name="'matches[' + index + '][requirements][' + reqIndex +
+                                                                            '][parameter_value]'"
+                                                                        x-model="req.parameter_value"
+                                                                        class="w-full text-xs font-bold px-3 py-2 bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-100 outline-none transition">
+                                                                        <option value="">Pilih...</option>
+                                                                        <template x-for="opt in req.options" :key="opt">
+                                                                            <option :value="opt" x-text="opt"></option>
+                                                                        </template>
+                                                                    </select>
+                                                                </template>
                                                             </div>
                                                             <div class="md:col-span-1 flex justify-center pt-4 md:pt-0">
                                                                 <button type="button"
@@ -503,7 +577,9 @@
         </div>
     </div>
     </div>
+    @endif
 
+    @if ($user->can('manage-events'))
     @foreach ($events['data'] as $event)
         <div id="modal-edit-event-{{ $event['uid'] }}" tabindex="-1" aria-hidden="true"
             class="hidden fixed top-0 left-0 right-0 z-[70] w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-full max-h-full items-center justify-center bg-slate-900/60 backdrop-blur-sm transition-opacity">
@@ -529,63 +605,80 @@
                         method="POST" enctype="multipart/form-data" x-data="{
                             tipe: 'berbayar',
                             categories: {{ json_encode($categories) }},
-                            matches: {{ json_encode(
-                                array_map(function ($m) {
-                                    return [
-                                        'uid_category' => $m['uid_category'],
-                                        'nama_acara' => $m['nama_acara'],
-                                        'tipe_biaya' => $m['tipe_biaya'],
-                                        'biaya_pendaftaran' => $m['biaya_pendaftaran'],
-                                        'jumlah_seri' => $m['jumlah_seri'],
-                                        'waktu_mulai' => $m['waktu_mulai'] ?? '08:00',
-                                        'requirements' => array_map(function ($r) {
-                                            return [
-                                                'parameter_name' => $r['parameter_name'],
-                                                'operator' => $r['operator'],
-                                                'parameter_value' => $r['parameter_value'],
-                                            ];
-                                        }, $m['requirements'] ?? []),
-                                    ];
-                                }, $event['eventCategories'] ?? []),
-                            ) }},
-                            addMatch() { this.matches.push({ uid_category: '', nama_acara: '', tipe_biaya: 'berbayar', biaya_pendaftaran: 0, jumlah_seri: 1, waktu_mulai: '08:00', requirements: [] }); },
+                            master_params: {{ json_encode($requirement_parameters) }},
+                            matches: {{ json_encode($event['matches_data']) }},
+                            addMatch() { this.matches.push({ uid_category: '', nomor_acara: '', nama_acara: '', tipe_biaya: 'berbayar', biaya_pendaftaran: 0, jumlah_seri: 1, waktu_mulai: '08:00', requirements: [] }); },
                             updateMatchName(index) {
                                 const cat = this.categories.find(c => c.uid === this.matches[index].uid_category);
                                 if (cat) { this.matches[index].nama_acara = cat.nama_kategori; }
                             },
                             removeMatch(index) { this.matches.splice(index, 1); },
                             addRequirement(matchIndex) {
-                                this.matches[matchIndex].requirements.push({ parameter_name: '', operator: '=', parameter_value: '' });
+                                this.matches[matchIndex].requirements.push({ parameter_name: '', operator: '=', parameter_value: '', input_type: 'text', options: [], allowed_operators: [] });
                             },
-                            removeRequirement(matchIndex, reqIndex) { this.matches[matchIndex].requirements.splice(reqIndex, 1); }
+                            removeRequirement(matchIndex, reqIndex) { this.matches[matchIndex].requirements.splice(reqIndex, 1); },
+                            onParamChange(mIdx, rIdx) {
+                                const pName = this.matches[mIdx].requirements[rIdx].parameter_name;
+                                const param = this.master_params.find(p => p.parameter_key === pName);
+                                if (param) {
+                                    this.matches[mIdx].requirements[rIdx].input_type = param.input_type || 'text';
+                                    this.matches[mIdx].requirements[rIdx].options = JSON.parse(param.input_options || '[]');
+                                    this.matches[mIdx].requirements[rIdx].allowed_operators = JSON.parse(param.allowed_operators || '[]');
+                                    if (!this.matches[mIdx].requirements[rIdx].allowed_operators.includes(this.matches[mIdx].requirements[rIdx].operator)) {
+                                        this.matches[mIdx].requirements[rIdx].operator = this.matches[mIdx].requirements[rIdx].allowed_operators[0] || '=';
+                                    }
+                                }
+                            }
                         }">
                         @csrf
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
 
                             <div class="md:col-span-2">
-                                <label
-                                    class="block mb-2 text-sm font-bold text-slate-700 uppercase tracking-wider text-left">
-                                    Banner Event (Klik untuk Ubah)
-                                </label>
+                                <label class="block mb-2 text-sm font-bold text-slate-700 uppercase tracking-wider text-left">Banner Event (Klik untuk Ubah)</label>
                                 <div class="flex items-center justify-center w-full">
                                     <label for="edit-banner-upload-{{ $event['uid'] }}"
                                         class="flex flex-col items-center justify-center w-full h-52 border-2 border-slate-300 border-dashed rounded-2xl cursor-pointer bg-slate-50 hover:bg-slate-100 transition relative overflow-hidden group">
-
                                         <div id="edit-preview-container-{{ $event['uid'] }}" class="absolute inset-0">
                                             <img id="edit-banner-preview-{{ $event['uid'] }}"
                                                 src="{{ $event['banner_event'] == null ? url('/file/dummy/dummy.webp') : url('/file/banner-event/' . $event['banner_event']) }}"
                                                 alt="Preview" class="w-full h-full object-cover">
-
-                                            <div
-                                                class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
-                                                <p class="text-white text-xs font-bold uppercase tracking-widest">Ganti
-                                                    Gambar</p>
+                                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
+                                                <p class="text-white text-xs font-bold uppercase tracking-widest">Ganti Gambar</p>
                                             </div>
                                         </div>
+                                        <input id="edit-banner-upload-{{ $event['uid'] }}" name="banner_event" type="file" class="hidden" accept="image/*" onchange="previewEditBanner(this, '{{ $event['uid'] }}')" />
+                                    </label>
+                                </div>
+                            </div>
 
-                                        <input id="edit-banner-upload-{{ $event['uid'] }}" name="banner_event"
-                                            type="file" class="hidden" accept="image/*"
-                                            onchange="previewEditBanner(this, '{{ $event['uid'] }}')" />
+                            <div>
+                                <label class="block mb-2 text-sm font-bold text-slate-700 uppercase tracking-wider text-left">Logo Kiri (Header Report)</label>
+                                <div class="flex items-center justify-center w-full">
+                                    <label for="edit-logo-kiri-upload-{{ $event['uid'] }}" class="flex flex-col items-center justify-center w-full h-32 border-2 border-slate-300 border-dashed rounded-2xl cursor-pointer bg-slate-50 hover:bg-slate-100 transition relative overflow-hidden group">
+                                        <div id="edit-preview-logo-kiri-{{ $event['uid'] }}" class="absolute inset-0 {{ $event['logo_kiri'] ? '' : 'hidden' }}">
+                                            <img id="edit-logo-kiri-preview-img-{{ $event['uid'] }}" src="{{ $event['logo_kiri'] ? url('/file/logos/' . $event['logo_kiri']) : '#' }}" alt="Preview" class="w-full h-full object-contain p-2">
+                                        </div>
+                                        <div id="edit-placeholder-logo-kiri-{{ $event['uid'] }}" class="flex flex-col items-center justify-center {{ $event['logo_kiri'] ? 'hidden' : '' }}">
+                                            <i data-lucide="image" class="w-6 h-6 text-slate-400 mb-1"></i>
+                                            <p class="text-[10px] text-slate-500 font-bold uppercase">Unggah Logo</p>
+                                        </div>
+                                        <input id="edit-logo-kiri-upload-{{ $event['uid'] }}" name="logo_kiri" type="file" class="hidden" accept="image/*" onchange="previewLogo(this, 'edit-logo-kiri-preview-img-{{ $event['uid'] }}', 'edit-preview-logo-kiri-{{ $event['uid'] }}', 'edit-placeholder-logo-kiri-{{ $event['uid'] }}')" />
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block mb-2 text-sm font-bold text-slate-700 uppercase tracking-wider text-left">Logo Kanan (Header Report)</label>
+                                <div class="flex items-center justify-center w-full">
+                                    <label for="edit-logo-kanan-upload-{{ $event['uid'] }}" class="flex flex-col items-center justify-center w-full h-32 border-2 border-slate-300 border-dashed rounded-2xl cursor-pointer bg-slate-50 hover:bg-slate-100 transition relative overflow-hidden group">
+                                        <div id="edit-preview-logo-kanan-{{ $event['uid'] }}" class="absolute inset-0 {{ $event['logo_kanan'] ? '' : 'hidden' }}">
+                                            <img id="edit-logo-kanan-preview-img-{{ $event['uid'] }}" src="{{ $event['logo_kanan'] ? url('/file/logos/' . $event['logo_kanan']) : '#' }}" alt="Preview" class="w-full h-full object-contain p-2">
+                                        </div>
+                                        <div id="edit-placeholder-logo-kanan-{{ $event['uid'] }}" class="flex flex-col items-center justify-center {{ $event['logo_kanan'] ? 'hidden' : '' }}">
+                                            <i data-lucide="image" class="w-6 h-6 text-slate-400 mb-1"></i>
+                                            <p class="text-[10px] text-slate-500 font-bold uppercase">Unggah Logo</p>
+                                        </div>
+                                        <input id="edit-logo-kanan-upload-{{ $event['uid'] }}" name="logo_kanan" type="file" class="hidden" accept="image/*" onchange="previewLogo(this, 'edit-logo-kanan-preview-img-{{ $event['uid'] }}', 'edit-preview-logo-kanan-{{ $event['uid'] }}', 'edit-placeholder-logo-kanan-{{ $event['uid'] }}')" />
                                     </label>
                                 </div>
                             </div>
@@ -753,7 +846,7 @@
 
                                                 <div class="md:col-span-12 mt-4 text-left border-none shadow-none">
                                                     <div
-                                                        class="p-5 bg-white border border-slate-100 rounded-xl shadow-inner text-left border-none shadow-none">
+                                                        class="p-5 bg-white border border-slate-100 rounded-xl shadow-inner border-none">
                                                         <div class="flex items-center justify-between mb-4">
                                                             <h4
                                                                 class="text-xs font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
@@ -776,12 +869,12 @@
                                                                             :name="'matches[' + mIndex + '][requirements][' +
                                                                                 reqIndex + '][parameter_name]'"
                                                                             x-model="req.parameter_name"
-                                                                            class="w-full text-xs font-bold px-3 py-2 bg-white border border-slate-200 rounded-lg shadow-none">
+                                                                            @change="onParamChange(mIndex, reqIndex)"
+                                                                            class="w-full text-xs font-bold px-3 py-2 bg-white border border-slate-200 rounded-lg shadow-none uppercase">
                                                                             <option value="">Parameter</option>
-                                                                            <option value="gender">Jenis Kelamin</option>
-                                                                            <option value="birth_year">Tahun Lahir</option>
-                                                                            <option value="age_min">Umur Min</option>
-                                                                            <option value="age_max">Umur Max</option>
+                                                                            <template x-for="p in master_params" :key="p.uid">
+                                                                                <option :value="p.parameter_key" x-text="p.display_name"></option>
+                                                                            </template>
                                                                         </select>
                                                                     </div>
                                                                     <div class="md:col-span-2 text-left">
@@ -790,22 +883,32 @@
                                                                                 reqIndex + '][operator]'"
                                                                             x-model="req.operator"
                                                                             class="w-full text-xs font-bold px-3 py-2 bg-white border border-slate-200 rounded-lg">
-                                                                            <option value="="> = </option>
-                                                                            <option value=">"> > </option>
-                                                                            <option value="<">< </option>
-                                                                            <option value=">="> >= </option>
-                                                                            <option value="<="> <= </option>
-                                                                            <option value="IN"> DI DALAM </option>
+                                                                            <template x-for="op in req.allowed_operators" :key="op">
+                                                                                <option :value="op" x-text="op"></option>
+                                                                            </template>
                                                                         </select>
                                                                     </div>
                                                                     <div
-                                                                        class="md:col-span-5 text-left text-left text-left">
-                                                                        <input type="text"
-                                                                            :name="'matches[' + mIndex + '][requirements][' +
-                                                                                reqIndex + '][parameter_value]'"
-                                                                            x-model="req.parameter_value"
-                                                                            placeholder="Nilai"
-                                                                            class="w-full text-xs font-bold px-3 py-2 bg-white border border-slate-200 rounded-lg">
+                                                                        class="md:col-span-5 text-left border-none shadow-none">
+                                                                        <template x-if="req.input_type !== 'select'">
+                                                                            <input :type="req.input_type || 'text'"
+                                                                                :name="'matches[' + mIndex + '][requirements][' +
+                                                                                    reqIndex + '][parameter_value]'"
+                                                                                x-model="req.parameter_value"
+                                                                                class="w-full text-xs font-bold px-3 py-2 bg-white border border-slate-200 rounded-lg">
+                                                                        </template>
+                                                                        <template x-if="req.input_type === 'select'">
+                                                                            <select
+                                                                                :name="'matches[' + mIndex + '][requirements][' +
+                                                                                    reqIndex + '][parameter_value]'"
+                                                                                x-model="req.parameter_value"
+                                                                                class="w-full text-xs font-bold px-3 py-2 bg-white border border-slate-200 rounded-lg">
+                                                                                <option value="">Pilih...</option>
+                                                                                <template x-for="opt in req.options" :key="opt">
+                                                                                    <option :value="opt" x-text="opt"></option>
+                                                                                </template>
+                                                                            </select>
+                                                                        </template>
                                                                     </div>
                                                                     <div
                                                                         class="md:col-span-1 flex justify-center text-left pt-2 md:pt-0">
@@ -826,44 +929,33 @@
                                 </div>
                             </div>
 
-
-                            <div class="md:col-span-2 text-left">
-                                <label
-                                    class="block mb-2 text-sm font-bold text-slate-700 uppercase tracking-wider text-left">Metode
-                                    Pembayaran</label>
+                            <div class="md:col-span-2">
+                                <label class="block mb-2 text-sm font-bold text-slate-700 uppercase tracking-wider text-left">Metode Pembayaran</label>
                                 <select name="uid_payment_method"
-                                    class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-ksc-blue block w-full p-3.5 outline-none font-bold">
+                                    class="bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-ksc-blue block w-full p-3.5 outline-none font-bold shadow-none">
                                     <option value="" disabled selected>-- Pilih Rekening Pembayaran --</option>
                                     @foreach ($payment_methods as $pm)
-                                        <option value="{{ $pm['uid'] }}"
-                                            {{ $event['uid_payment_method'] == $pm['uid'] ? 'selected' : '' }}>
+                                        <option value="{{ $pm['uid'] }}" {{ $event['uid_payment_method'] == $pm['uid'] ? 'selected' : '' }}>
                                             {{ $pm['bank'] }} - {{ $pm['rekening'] }} (a.n {{ $pm['atas_nama'] }})
                                         </option>
                                     @endforeach
                                 </select>
                             </div>
 
-                            <div class="md:col-span-2 text-left">
-                                <label
-                                    class="block mb-2 text-sm font-bold text-slate-700 uppercase tracking-wider text-left capitalize">Deskripsi
-                                    & Peraturan</label>
-                                <div
-                                    class="bg-slate-50 border border-slate-300 rounded-2xl overflow-hidden font-sans shadow-inner">
-                                    <div id="edit-editor-{{ $event['uid'] }}" class="h-56 bg-white text-left">
-                                        {!! $event['deskripsi'] !!}
-                                    </div>
-                                    <input type="hidden" name="deskripsi" id="edit-deskripsi-input-{{ $event['uid'] }}"
-                                        value="{{ htmlspecialchars($event['deskripsi'] ?? '') }}">
+                            <div class="md:col-span-2">
+                                <label class="block mb-2 text-sm font-bold text-slate-700 uppercase tracking-wider text-left">Deskripsi & Peraturan</label>
+                                <div class="bg-slate-50 border border-slate-200 rounded-2xl overflow-hidden shadow-none font-sans">
+                                    <div id="edit-editor-{{ $event['uid'] }}" class="h-56 bg-white text-left">{!! $event['deskripsi'] !!}</div>
+                                    <input type="hidden" name="deskripsi" id="edit-deskripsi-input-{{ $event['uid'] }}" value="{{ $event['deskripsi'] }}">
                                 </div>
                             </div>
                         </div>
 
                         <div class="flex items-center pt-8 mt-6 border-t border-slate-100 space-x-3 justify-end">
                             <button data-modal-hide="modal-edit-event-{{ $event['uid'] }}" type="button"
-                                class="text-slate-500 bg-white hover:bg-slate-50 rounded-xl border border-slate-200 text-sm font-bold px-8 py-3 transition shadow-none border-slate-200">Batal</button>
+                                class="text-slate-500 bg-white hover:bg-slate-50 rounded-xl border border-slate-200 text-sm font-bold px-8 py-3 transition">Batal</button>
                             <button type="submit"
-                                class="text-white bg-slate-900 hover:bg-black font-bold rounded-xl text-sm px-10 py-3 shadow-xl transition-all shadow-none">Simpan
-                                Perubahan</button>
+                                class="text-white bg-slate-900 hover:bg-black font-bold rounded-xl text-sm px-10 py-3 shadow-xl transition-all">Simpan Perubahan</button>
                         </div>
                     </form>
                 </div>
@@ -898,6 +990,7 @@
             </div>
         </div>
     @endforeach
+    @endif
 
     <script>
         // *** FUNGSI UNTUK PREVIEW BANNER ***
@@ -975,6 +1068,7 @@
                 ['link', 'blockquote', 'clean']
             ];
 
+            @if ($user->can('manage-events'))
             @foreach ($events['data'] as $event)
                 (function() {
                     const uid = "{{ $event['uid'] }}";
@@ -1000,6 +1094,7 @@
                     }
                 })();
             @endforeach
+            @endif
         });
 
         // 3. Global Preview Functions (Satu saja cukup)
@@ -1014,6 +1109,18 @@
                         preview.classList.remove('opacity-0');
                         preview.classList.add('animate-in', 'fade-in', 'zoom-in', 'duration-500');
                     }, 100);
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function previewLogo(input, imgId, containerId, placeholderId) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById(imgId).setAttribute('src', e.target.result);
+                    document.getElementById(containerId).classList.remove('hidden');
+                    document.getElementById(placeholderId).classList.add('hidden');
                 }
                 reader.readAsDataURL(input.files[0]);
             }

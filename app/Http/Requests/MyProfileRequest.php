@@ -74,7 +74,7 @@ class MyProfileRequest extends FormRequest
             'sekolah' => 'nullable|string|max:100',
             'kelas' => 'nullable|string|max:20',
             'jabatan_klub' => 'nullable|string|max:100',
-            'vaksin_covid' => 'nullable|integer',
+            'vaksin_covid' => 'nullable|numeric',
         ];
     }
 

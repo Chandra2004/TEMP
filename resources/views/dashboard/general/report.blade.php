@@ -82,6 +82,7 @@
                                     class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm font-bold rounded-xl focus:ring-4 focus:ring-blue-50 focus:border-ksc-blue p-3.5 outline-none transition appearance-none cursor-pointer">
                                     <option value="pendaftaran">Data Pendaftaran Event</option>
                                     <option value="buku_acara">Buku Acara (Program Book)</option>
+                                    <option value="buku_hasil">Buku Hasil Lomba (Official Result)</option>
                                     <option value="keanggotaan" disabled>Data Seluruh Keanggotaan (Coming Soon)</option>
                                     <option value="keuangan" disabled>Rekapitulasi Keuangan (Coming Soon)</option>
                                     <option value="presensi" disabled>Laporan Presensi Latihan (Coming Soon)</option>
@@ -254,6 +255,16 @@
 
                 if (type === 'buku_acara') {
                     const url = `/${role}/dashboard/management-event/${event}/export-buku-acara`;
+                    window.open(url, '_blank');
+                    return;
+                }
+
+                if (type === 'buku_hasil') {
+                    if (event === 'all') {
+                        alert('Silakan pilih salah satu event spesifik untuk mencetak Buku Hasil.');
+                        return;
+                    }
+                    const url = `/${role}/dashboard/management-event/${event}/export-buku-hasil`;
                     window.open(url, '_blank');
                     return;
                 }

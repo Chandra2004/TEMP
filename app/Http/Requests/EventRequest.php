@@ -40,6 +40,8 @@ class EventRequest extends FormRequest
     {
         return [
             'banner_event' => 'nullable|mimes:jpg,png,jpeg|max:2048',
+            'logo_kiri' => 'nullable|mimes:jpg,png,jpeg|max:2048',
+            'logo_kanan' => 'nullable|mimes:jpg,png,jpeg|max:2048',
             'nama_event' => 'required',
             'deskripsi' => 'nullable|string',
             'lokasi_event' => 'required',
@@ -65,6 +67,8 @@ class EventRequest extends FormRequest
     {
         return [
             'banner_event' => 'banner event',
+            'logo_kiri' => 'logo kiri',
+            'logo_kanan' => 'logo kanan',
             'nama_event' => 'nama event',
             'deskripsi' => 'deskripsi',
             'lokasi_event' => 'lokasi event',

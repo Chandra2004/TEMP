@@ -77,7 +77,17 @@ class RegistrationController extends DashboardController
             ->orderBy('created_at', 'DESC')
             ->all();
 
-        return View::render('dashboard.member.registration-history', array_merge($this->dataTetap, [
+        // Transformasi data untuk menyesuaikan ekspektasi View (Flattening structure)
+        foreach ($registrations as &$reg) {
+            $reg['event'] = $reg['eventCategory']['event'] ?? null;
+            if ($reg['event']) {
+                $reg['event']['category'] = $reg['eventCategory']['category'] ?? null;
+            }
+            $reg['status'] = $reg['status_pendaftaran'] ?? 'pending';
+            $reg['tanggal_registrasi'] = $reg['created_at'] ?? date('Y-m-d H:i:s');
+        }
+
+        return View::render('dashboard.atlet.registration-history', array_merge($this->dataTetap, [
             'title' => 'Riwayat Pendaftaran | Khafid Swimming Club (KSC) - Official Website',
             'registrations' => $registrations
         ]));
